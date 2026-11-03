@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لعبة الشدّة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#e8f5ff;--card:#fff;--ink:#1b2a4a;--pri:#7b5cff;--sun:#ffc93c;--ok:#16a06f;--bad:#ef476f;--line:#c9defa}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14193a;--card:#1f2650;--ink:#f2f4ff;--pri:#9f87ff;--line:#38428a}}
+:root[data-theme="dark"]{--bg:#14193a;--card:#1f2650;--ink:#f2f4ff;--pri:#9f87ff;--line:#38428a}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:'Cairo','Segoe UI',Tahoma,sans-serif;font-weight:600;font-size:18px}
+#app{max-width:520px;margin:0 auto;padding:14px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:16px}
+.dots{display:flex;gap:6px}.dots i{width:12px;height:12px;border-radius:50%;background:var(--line)}.dots i.on{background:var(--pri)}
+.card{background:var(--card);border:3px solid var(--line);border-radius:24px;padding:20px;text-align:center}
+h1{font-size:34px;margin:0 0 8px;font-weight:800}h2{font-size:21px;margin:0 0 14px;font-weight:800}
+p{margin:8px 0;line-height:1.8}
+.big{font-size:120px;line-height:1.5;font-weight:800;color:var(--pri)}
+.split{font-size:46px;font-weight:800;min-height:80px;line-height:1.6}
+.split b{color:var(--ok)}.split u{color:var(--bad);text-decoration:none}
+.btn{font:inherit;font-weight:800;font-size:20px;border:0;border-radius:18px;padding:12px 26px;margin:8px 4px 0;background:var(--sun);color:#1b2a4a;cursor:pointer;box-shadow:0 5px 0 #d9a21a}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #d9a21a}
+.btn.alt{background:var(--card);color:var(--ink);border:3px solid var(--line);box-shadow:none}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}
+.opt{font:inherit;color:var(--ink);background:var(--bg);border:3px solid var(--line);border-radius:20px;padding:12px 6px;cursor:pointer;font-size:30px;font-weight:800}
+.opt .e{display:block;font-size:44px}
+.opt.ok,.ok{border-color:var(--ok);background:rgba(22,160,111,.18)}
+.opt.bad{border-color:var(--bad);background:rgba(239,71,111,.15);animation:sh .35s}
+@keyframes sh{25%{transform:translateX(8px)}75%{transform:translateX(-8px)}}
+.word{font-size:72px;font-weight:800;line-height:1.7}
+.word .hl{color:var(--pri);border-bottom:6px solid var(--sun)}
+.tap{cursor:pointer}.tap.sh{color:var(--ok)}
+.msg{min-height:34px;margin:10px 0 0;font-weight:800}
+.msg.ok{color:var(--ok);background:none;border:0}.msg.bad{color:var(--bad)}
+.hide{display:none}
+@media (prefers-reduced-motion:reduce){.opt.bad{animation:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const SH=[{w:"قِطَّة",e:"🐱"},{w:"بَطَّة",e:"🦆"},{w:"كُرَّة",e:"⚽"},{w:"جَدَّة",e:"👵"},{w:"دُبّ",e:"🐻"},{w:"مُعَلِّم",e:"👨‍🏫"},{w:"طَبَّاخ",e:"👨‍🍳"},{w:"سَيَّارَة",e:"🚗"}];
+const NO=[{w:"قَمَر",e:"🌙"},{w:"شَمْس",e:"☀️"},{w:"بَيْت",e:"🏠"},{w:"وَرْدَة",e:"🌹"},{w:"نَجْمَة",e:"⭐"},{w:"فِيل",e:"🐘"},{w:"سَمَكَة",e:"🐟"},{w:"شَجَرَة",e:"🌳"}];
+const BQ=[{p:["قِ","طَّ","ة"],i:1},{p:["بَ","طَّ","ة"],i:0},{p:["كُ","رَّ","ة"],i:1},{p:["قَ","مَ","ر"],i:0},{p:["سَ","يَّ","ا","رَ","ة"],i:1},{p:["شَ","مْ","سْ"],i:0}];
+const CQ=[{l:[["ك","ُ"],["ر","َ"],["ة",""]],s:1,e:"⚽"},{l:[["ق","ِ"],["ط","َ"],["ة",""]],s:1,e:"🐱"},{l:[["ب","َ"],["ط","َ"],["ة",""]],s:1,e:"🦆"},{l:[["ج","َ"],["د","َ"],["ة",""]],s:1,e:"👵"},{l:[["د","ُ"],["ب",""]],s:1,e:"🐻"},{l:[["س","َ"],["ي","َ"],["ا",""],["ر","َ"],["ة",""]],s:1,e:"🚗"},{l:[["م","ُ"],["د","َ"],["ر","ِ"],["س",""]],s:2,e:"👨‍🏫"}];
+const NAMES=["اعثر على الشدّة","كم مرّة نقولها؟","ضع الشدّة"];
+const SD="ّ";
+const $=id=>document.getElementById(id);
+const mix=a=>[...a].sort(()=>Math.random()-.5);
+let SND=true,AC=null,VO=null;
+function pickVoice(){try{VO=speechSynthesis.getVoices().find(v=>/^ar/i.test(v.lang))||null}catch(e){}}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
+function speak(t){if(!SND)return;try{speechSynthesis.cancel();speechSynthesis.resume();const u=new SpeechSynthesisUtterance(t);u.lang='ar-SA';if(VO)u.voice=VO;u.rate=.7;u.volume=1;speechSynthesis.speak(u)}catch(e){}}
+function tone(f,d,t0,ty){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.type=ty||'sine';o.frequency.value=f;o.connect(g);g.connect(AC.destination);const s=AC.currentTime+t0;g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.25,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.start(s);o.stop(s+d+.05)}catch(e){}}
+function sfx(ok){if(!SND)return;if(ok){tone(523,.15,0);tone(659,.15,.12);tone(784,.25,.24)}else{tone(220,.25,0,'triangle');tone(165,.3,.15,'triangle')}}
+function toggleSnd(){SND=!SND;const b=$('sn');if(b)b.textContent=SND?'🔊':'🔇';if(SND){tone(660,.12,0);speak('مرحبا')}else{try{speechSynthesis.cancel()}catch(e){}}}
+let S={l:0,q:0,stars:0,qs:[],tries:0,done:false};
+const app=$('app');
+
+function home(){
+ app.innerHTML=`<div class="card"><div style="font-size:64px">🌟</div><h1>لعبة الشدّة</h1>
+ <p>تعلّم معنا العلامة الصغيرة التي تجعل الحرف يُقال مرّتين.<br>🔊 ارفع صوت الجهاز لتسمع الكلمات والمؤثرات.</p>
+ <button class="btn" onclick="intro()">هيّا نتعلّم</button></div>`;
+}
+function intro(){tone(660,.12,0);
+ app.innerHTML=`<div class="card"><h2>ما هي الشدّة؟</h2>
+ <div class="big" id="bg">طَّ</div>
+ <p>الشدّة <b>( ّ )</b> علامة فوق الحرف.<br>معناها أن الحرف يُقال مرّتين:<br>مرّة بالسكون، ومرّة بالحركة.</p>
+ <div class="split" id="sp"></div>
+ <button class="btn alt" onclick="demo()">🔊 اضغط لترى وتسمع</button><br>
+ <button class="btn" onclick="startLevel(0)">ابدأ اللعب</button></div>`;
+}
+function demo(){$('sp').innerHTML='<u>طْ</u> + <b>طَ</b>';speak('طَّ');}
+function build(l){
+ if(l==0)return mix(SH).slice(0,4).map(s=>{const o=mix([{...s,s:1},...mix(NO).slice(0,2)]);return{o}});
+ if(l==1)return mix(BQ).slice(0,4);
+ return mix(CQ).slice(0,4);
+}
+function startLevel(l){S.l=l;S.q=0;S.qs=build(l);S.tries=0;S.done=false;draw();}
+function head(){
+ return `<div class="top"><span>${NAMES[S.l]} · المستوى ${S.l+1}</span><span><button class="btn alt" id="sn" style="margin:0;padding:2px 12px;font-size:20px" onclick="toggleSnd()">${SND?'🔊':'🔇'}</button> <span id="st">⭐ ${S.stars}</span></span></div>
+ <div class="top"><div class="dots">${[0,1,2,3].map(i=>`<i class="${i<=S.q?'on':''}"></i>`).join('')}</div></div>`;
+}
+function foot(){return `<div class="msg" id="msg"></div><button class="btn hide" id="nx" onclick="next()">التالي</button>`;}
+function draw(){
+ const q=S.qs[S.q];let b='';
+ if(S.l==0){
+  b=`<h2>أيُّ كلمةٍ فيها شدّة؟</h2><div class="opts">${q.o.map((o,i)=>`<button class="opt" onclick="ansA(${i})"><span class="e">${o.e}</span>${o.w}</button>`).join('')}</div>`;
+ }else if(S.l==1){
+  b=`<h2>كم مرّة نقول الحرف الملوّن؟</h2><div class="word">${q.p.map((x,j)=>`<span class="${j==q.i?'hl':''}">${x}</span>`).join('')}</div>
+  <button class="btn alt" onclick="speak(S.qs[S.q].p.join(''))">🔊 استمع للكلمة</button><div class="opts"><button class="opt" onclick="ansB(0)">مرّة واحدة</button><button class="opt" onclick="ansB(1)">مرّتين</button></div>`;
+ }else{
+  b=`<h2>اضغط على الحرف الذي نضع عليه الشدّة</h2><div style="font-size:50px">${q.e}</div><div class="word" id="wd"></div><button class="btn alt" onclick="speak(S.qs[S.q].l.map(x=>x[0]+x[1]).join(''))">🔊 استمع</button>`;
+ }
+ app.innerHTML=head()+`<div class="card">${b}${foot()}</div>`;
+ if(S.l==2)wordC(-1);
+}
+function wordC(sh){
+ const q=S.qs[S.q];
+ $('wd').innerHTML=q.l.map((x,j)=>`<span class="tap ${j===sh?'sh':''}" onclick="ansC(${j})">${x[0]+(j===sh?SD:'')+x[1]}</span>`).join('');
+}
+function good(t){
+ sfx(true);S.done=true;if(S.tries==0){S.stars++;$('st').textContent='⭐ '+S.stars;}
+ $('msg').className='msg ok';$('msg').textContent=t;$('nx').classList.remove('hide');
+}
+function bad(){sfx(false);S.tries++;$('msg').className='msg bad';$('msg').textContent='حاول مرّة أخرى 💪';}
+function ansA(i){
+ if(S.done)return;const o=S.qs[S.q].o[i],bt=document.querySelectorAll('.opt')[i];
+ speak(o.w);
+ if(o.s){bt.classList.add('ok');good('أحسنت! في الكلمة شدّة 🎉');}else{bt.classList.remove('bad');void bt.offsetWidth;bt.classList.add('bad');bad();}
+}
+function ansB(k){
+ if(S.done)return;const q=S.qs[S.q],two=q.p[q.i].includes(SD),bt=document.querySelectorAll('.opt')[k];
+ if((k==1)==two){bt.classList.add('ok');good(two?'صحيح! الحرف المشدّد يُقال مرّتين 🎉':'صحيح! لا توجد شدّة، فنقوله مرّة 🎉');speak(q.p.join(''));}
+ else{bt.classList.remove('bad');void bt.offsetWidth;bt.classList.add('bad');bad();}
+}
+function ansC(j){
+ if(S.done)return;const q=S.qs[S.q];
+ if(j==q.s){wordC(j);good('ممتاز! 🎉');speak(q.l.map((x,k)=>x[0]+(k==j?SD:'')+x[1]).join(''));}else bad();
+}
+function next(){
+ S.q++;S.tries=0;S.done=false;
+ if(S.q>=4){if(S.l<2)startLevel(S.l+1);else end();}else draw();
+}
+function end(){
+ const t=S.stars>=10?'أنت بطل الشدّة! 🏆':S.stars>=6?'عمل رائع! واصل التعلّم 👏':'بداية جميلة، جرّب مرّة أخرى 💪';
+ app.innerHTML=`<div class="card"><div style="font-size:72px">🎉</div><h1>⭐ ${S.stars} / 12</h1><p>${t}</p>
+ <button class="btn" onclick="S.stars=0;startLevel(0)">العب مرّة أخرى</button>
+ <button class="btn alt" onclick="intro()">راجع الدرس</button></div>`;
+}
+home();
+</script>
+</body>
+</html>

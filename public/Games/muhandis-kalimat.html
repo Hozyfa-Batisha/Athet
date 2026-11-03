@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة مهندس الكلمات</title>
+  <style>
+    :root {
+      --primary-color: #ff9800;
+      --secondary-color: #2196f3;
+      --bg-color: #fff8e1;
+      --card-bg: #ffffff;
+      --text-color: #37474f;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .game-container {
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 650px;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      color: #e65100;
+      margin-top: 0;
+      font-size: 2rem;
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background: #ffe0b2;
+      padding: 10px 20px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      border: 2px solid #ffcc80;
+    }
+
+    .target-image-box {
+      font-size: 4.5rem;
+      margin-bottom: 10px;
+    }
+
+    .instructions {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #0277bd;
+      margin-bottom: 20px;
+    }
+
+    /* أجزاء الإجابة المتجمعة */
+    .word-slots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 30px;
+      min-height: 70px;
+    }
+
+    .slot {
+      width: 60px;
+      height: 60px;
+      border: 3px dashed #b0bec5;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      background: #f5f5f5;
+      color: #263238;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .slot.filled {
+      border: 3px solid #4caf50;
+      background: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    /* الحروف المبعثرة */
+    .letters-pool {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .btn-letter {
+      width: 65px;
+      height: 65px;
+      background: #ffffff;
+      border: 3px solid #2196f3;
+      border-radius: 18px;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #0d47a1;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+
+    .btn-letter:hover {
+      transform: translateY(-4px);
+      background: #e3f2fd;
+    }
+
+    .btn-letter:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .action-btns {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .btn-action {
+      background: #78909c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-action:hover {
+      background: #546e7a;
+    }
+
+    .result-modal {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .result-modal h2 {
+      font-size: 2.5rem;
+      color: #e65100;
+      margin-bottom: 10px;
+    }
+
+    .btn-reset {
+      background: #ff9800;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+    }
+
+    .btn-reset:hover {
+      background: #f57c00;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <h1>🛠️ مهندس الكلمات</h1>
+
+    <div class="score-board">
+      <span>النقاط: <span id="score">0</span> 🌟</span>
+      <span>الكلمة: <span id="question-num">1</span> / 10 🎯</span>
+    </div>
+
+    <div class="target-image-box" id="target-emoji">👑</div>
+    <div class="instructions">اضغط على الحروف لترتيب الكلمة بالشكل الصحيح:</div>
+
+    <div class="word-slots" id="word-slots">
+      <!-- مربعات وضع الحروف -->
+    </div>
+
+    <div class="letters-pool" id="letters-pool">
+      <!-- الحروف المبعثرة -->
+    </div>
+
+    <div class="action-btns">
+      <button class="btn-action" onclick="resetCurrentWord()">إعادة المحاولة 🔄</button>
+    </div>
+
+    <div class="result-modal" id="result-modal">
+      <h2>⚙️ مهندس مبدع! ⚙️</h2>
+      <p style="font-size: 1.3rem; margin-bottom: 20px;">نجحت في تجميع وتشييد جميع الكلمات!</p>
+      <p style="font-size: 1.5rem; font-weight: bold;">النتيجة النهائية: <span id="final-score">0</span> / 10</p>
+      <button class="btn-reset" onclick="startGame()">العب مرة أخرى 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // قاعدة الكلمات المناسبة للأطفال
+    const questionsDatabase = [
+      { emoji: "👑", word: "مَلِك", letters: ["مـ", "ـلـ", "ـك"] },
+      { emoji: "✏️", word: "قَلَم", letters: ["قـ", "ـلـ", "ـم"] },
+      { emoji: "⛵", word: "مَرْكَب", letters: ["مـ", "ـر", "كـ", "ـب"] },
+      { emoji: "🐪", word: "جَمَل", letters: ["جـ", "ـمـ", "ـل"] },
+      { emoji: "🐟", word: "سَمَك", letters: ["سـ", "ـمـ", "ـك"] },
+      { emoji: "📕", word: "كِتَاب", letters: ["كـ", "ـتـ", "ـا", "ب"] },
+      { emoji: "🐝", word: "نَحْلَة", letters: ["نـ", "ـحـ", "ـلـ", "ـة"] },
+      { emoji: "🍎", word: "تُفَّاح", letters: ["تـ", "ـفـ", "ـا", "ح"] },
+      { emoji: "🦩", word: "طَائِر", letters: ["طـ", "ـا", "ئـ", "ـر"] },
+      { emoji: "🌟", word: "نَجْمَة", letters: ["نـ", "ـجـ", "ـمـ", "ـة"] }
+    ];
+
+    let currentQuestions = [];
+    let currentStep = 0;
+    let score = 0;
+    let selectedLetters = [];
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'click') {
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.08);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(90, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      }
+    }
+
+    function startGame() {
+      currentQuestions = [...questionsDatabase].sort(() => Math.random() - 0.5);
+      currentStep = 0;
+      score = 0;
+      document.getElementById("score").innerText = score;
+      document.getElementById("result-modal").style.display = "none";
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentStep >= currentQuestions.length) {
+        showResults();
+        return;
+      }
+
+      const q = currentQuestions[currentStep];
+      selectedLetters = [];
+
+      document.getElementById("question-num").innerText = currentStep + 1;
+      document.getElementById("target-emoji").innerText = q.emoji;
+
+      // بناء المربعات الخالية
+      const slotsContainer = document.getElementById("word-slots");
+      slotsContainer.innerHTML = "";
+      for (let i = 0; i < q.letters.length; i++) {
+        const slot = document.createElement("div");
+        slot.className = "slot";
+        slot.id = `slot-${i}`;
+        slotsContainer.appendChild(slot);
+      }
+
+      // خلط الحروف المبعثرة
+      const shuffledLetters = [...q.letters].sort(() => Math.random() - 0.5);
+
+      const poolContainer = document.getElementById("letters-pool");
+      poolContainer.innerHTML = "";
+
+      shuffledLetters.forEach((letter, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "btn-letter";
+        btn.innerText = letter;
+        btn.id = `btn-letter-${idx}`;
+        btn.onclick = () => selectLetter(letter, btn);
+        poolContainer.appendChild(btn);
+      });
+    }
+
+    function selectLetter(letter, btn) {
+      const q = currentQuestions[currentStep];
+      if (selectedLetters.length < q.letters.length) {
+        playSound('click');
+        selectedLetters.push(letter);
+        btn.disabled = true;
+
+        const currentSlotIndex = selectedLetters.length - 1;
+        const slot = document.getElementById(`slot-${currentSlotIndex}`);
+        slot.innerText = letter;
+        slot.classList.add("filled");
+
+        if (selectedLetters.length === q.letters.length) {
+          checkWord();
+        }
+      }
+    }
+
+    function checkWord() {
+      const q = currentQuestions[currentStep];
+      const isCorrect = selectedLetters.every((val, index) => val === q.letters[index]);
+
+      if (isCorrect) {
+        playSound('correct');
+        score += 1;
+        document.getElementById("score").innerText = score;
+
+        setTimeout(() => {
+          currentStep++;
+          loadQuestion();
+        }, 900);
+      } else {
+        playSound('wrong');
+        setTimeout(() => {
+          resetCurrentWord();
+        }, 800);
+      }
+    }
+
+    function resetCurrentWord() {
+      selectedLetters = [];
+      const q = currentQuestions[currentStep];
+
+      // إرجاع المربعات
+      for (let i = 0; i < q.letters.length; i++) {
+        const slot = document.getElementById(`slot-${i}`);
+        if (slot) {
+          slot.innerText = "";
+          slot.classList.remove("filled");
+        }
+      }
+
+      // تفعيل زر الحروف
+      const buttons = document.querySelectorAll(".btn-letter");
+      buttons.forEach(btn => btn.disabled = false);
+    }
+
+    function showResults() {
+      document.getElementById("final-score").innerText = score;
+      document.getElementById("result-modal").style.display = "flex";
+    }
+
+    window.onload = startGame;
+  </script>
+</body>
+</html>

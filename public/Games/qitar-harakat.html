@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة قطار الحركات القصيرة</title>
+  <style>
+    :root {
+      --primary-color: #ff5722;
+      --secondary-color: #4caf50;
+      --bg-color: #e0f7fa;
+      --card-bg: #ffffff;
+      --text-color: #263238;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .game-container {
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 650px;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-top: 0;
+      font-size: 2rem;
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background: #fff3e0;
+      padding: 10px 20px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      border: 2px solid #ffe0b2;
+    }
+
+    .train-container {
+      position: relative;
+      background: #b2ebf2;
+      border-radius: 16px;
+      padding: 30px 10px;
+      margin-bottom: 25px;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 160px;
+    }
+
+    .target-box {
+      font-size: 3.5rem;
+      font-weight: bold;
+      color: #0288d1;
+      background: white;
+      padding: 15px 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      border: 4px dashed #0288d1;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .instructions {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      color: #37474f;
+      font-weight: bold;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .btn-option {
+      background: #ffffff;
+      border: 3px solid #b0bec5;
+      border-radius: 16px;
+      padding: 15px;
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: var(--text-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    }
+
+    .btn-option:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-color);
+      background: #fbe9e7;
+    }
+
+    .btn-option:active {
+      transform: translateY(0);
+    }
+
+    .result-modal {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .result-modal h2 {
+      font-size: 2.5rem;
+      color: var(--secondary-color);
+      margin-bottom: 10px;
+    }
+
+    .btn-reset {
+      background: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+    }
+
+    .btn-reset:hover {
+      background: #388e3c;
+    }
+
+    /* تأثير النجاح */
+    .correct-anim {
+      animation: bounce 0.5s ease;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <h1>🚂 قطار الحركات القصيرة</h1>
+
+    <div class="score-board">
+      <span>النقاط: <span id="score">0</span> 🌟</span>
+      <span>السؤال: <span id="question-num">1</span> / 10 🎯</span>
+    </div>
+
+    <div class="instructions" id="instruction">
+      اختر الحرف بالحركة المناسبة!
+    </div>
+
+    <div class="train-container">
+      <div class="target-box" id="target-text">؟</div>
+    </div>
+
+    <div class="options-grid" id="options-container">
+      <!-- الخيارات ستولد بالجاڤاسكريبت -->
+    </div>
+
+    <div class="result-modal" id="result-modal">
+      <h2>🎉 ممتاز جداً! 🎉</h2>
+      <p style="font-size: 1.3rem; margin-bottom: 20px;">أكملت رحلة قطار الحركات بنجاح!</p>
+      <p style="font-size: 1.5rem; font-weight: bold;">النتيجة النهائية: <span id="final-score">0</span> / 10</p>
+      <button class="btn-reset" onclick="startGame()">العب مرة أخرى 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // قائمة الأسئلة المتنوعة للحركات القصيرة
+    const questionsDatabase = [
+      { target: "بَ", soundName: "بَ (فتحة)", options: ["بَ", "بُ", "بِ"], correct: 0 },
+      { target: "تُ", soundName: "تُ (ضمة)", options: ["تِ", "تُ", "تَ"], correct: 1 },
+      { target: "سِ", soundName: "سِ (كسرة)", options: ["سَ", "سُ", "سِ"], correct: 2 },
+      { target: "رَ", soundName: "رَ (فتحة)", options: ["رَ", "رِ", "رُ"], correct: 0 },
+      { target: "مُ", soundName: "مُ (ضمة)", options: ["مِ", "مُ", "مَ"], correct: 1 },
+      { target: "لِ", soundName: "لِ (كسرة)", options: ["لِ", "لَ", "لُ"], correct: 0 },
+      { target: "جَ", soundName: "جَ (فتحة)", options: ["جُ", "جَ", "جِ"], correct: 1 },
+      { target: "دُ", soundName: "دُ (ضمة)", options: ["دِ", "دَ", "دُ"], correct: 2 },
+      { target: "حِ", soundName: "حِ (كسرة)", options: ["حِ", "حُ", "حَ"], correct: 0 },
+      { target: "قَ", soundName: "قَ (فتحة)", options: ["قُ", "قَ", "قِ"], correct: 1 }
+    ];
+
+    let currentQuestions = [];
+    let currentStep = 0;
+    let score = 0;
+
+    // الأصوات باستخدام Web Audio API
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+        osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.2); // E5
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(110, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      }
+    }
+
+    function startGame() {
+      // خلط الأسئلة
+      currentQuestions = [...questionsDatabase].sort(() => Math.random() - 0.5);
+      currentStep = 0;
+      score = 0;
+      document.getElementById("score").innerText = score;
+      document.getElementById("result-modal").style.display = "none";
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentStep >= currentQuestions.length) {
+        showResults();
+        return;
+      }
+
+      const q = currentQuestions[currentStep];
+      document.getElementById("question-num").innerText = currentStep + 1;
+      document.getElementById("instruction").innerText = `أي حافلة تحمل صوت: ${q.soundName}؟`;
+      
+      const targetBox = document.getElementById("target-text");
+      targetBox.innerText = q.target;
+      targetBox.classList.remove("correct-anim");
+
+      const optionsContainer = document.getElementById("options-container");
+      optionsContainer.innerHTML = "";
+
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement("button");
+        btn.className = "btn-option";
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(index, btn);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedIndex, btn) {
+      const q = currentQuestions[currentStep];
+      const targetBox = document.getElementById("target-text");
+
+      if (selectedIndex === q.correct) {
+        playSound('correct');
+        score += 1;
+        document.getElementById("score").innerText = score;
+        btn.style.backgroundColor = "#c8e6c9";
+        btn.style.borderColor = "#4caf50";
+        targetBox.classList.add("correct-anim");
+
+        setTimeout(() => {
+          currentStep++;
+          loadQuestion();
+        }, 800);
+      } else {
+        playSound('wrong');
+        btn.style.backgroundColor = "#ffcdd2";
+        btn.style.borderColor = "#f44336";
+        btn.disabled = true;
+      }
+    }
+
+    function showResults() {
+      document.getElementById("final-score").innerText = score;
+      document.getElementById("result-modal").style.display = "flex";
+    }
+
+    // بدء اللعبة فور تحميل الصفحة
+    window.onload = startGame;
+  </script>
+</body>
+</html>

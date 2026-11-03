@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>فقاعات الشدّة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#d9f3ff;--card:#fff;--ink:#12304a;--sun:#ffc93c;--ok:#16a06f;--bad:#ef476f;--line:#a9d8f2;--sea1:#8fd8ff;--sea2:#3f9be0}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1d33;--card:#17304f;--ink:#eaf6ff;--line:#2d5a86;--sea1:#1d4f7e;--sea2:#0b2a4d}}
+:root[data-theme="dark"]{--bg:#0e1d33;--card:#17304f;--ink:#eaf6ff;--line:#2d5a86;--sea1:#1d4f7e;--sea2:#0b2a4d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:'Cairo','Segoe UI',Tahoma,sans-serif;font-weight:600;font-size:18px;user-select:none}
+#app{max-width:560px;margin:0 auto;padding:12px}
+.hud{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;font-size:20px;font-weight:800}
+.card{background:var(--card);border:3px solid var(--line);border-radius:24px;padding:20px;text-align:center}
+h1{font-size:34px;margin:0 0 8px;font-weight:800}p{margin:8px 0;line-height:1.8}
+.btn{font:inherit;font-weight:800;font-size:20px;border:0;border-radius:18px;padding:12px 26px;margin:8px 4px 0;background:var(--sun);color:#12304a;cursor:pointer;box-shadow:0 5px 0 #d9a21a}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #d9a21a}
+.btn.alt{background:var(--card);color:var(--ink);border:3px solid var(--line);box-shadow:none}
+.sn{margin:0;padding:2px 12px;font-size:20px}
+#area{position:relative;height:min(64vh,560px);min-height:340px;overflow:hidden;border-radius:24px;border:3px solid var(--line);background:linear-gradient(var(--sea1),var(--sea2));touch-action:manipulation}
+#area.hurt{animation:sh .35s}
+@keyframes sh{25%{transform:translateX(8px)}75%{transform:translateX(-8px)}}
+.bub{position:absolute;top:0;left:0;width:112px;height:112px;border-radius:50%;border:3px solid rgba(255,255,255,.9);color:#12304a;font:inherit;font-weight:800;font-size:25px;line-height:1.1;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset -8px -8px 16px rgba(255,255,255,.55),0 4px 10px rgba(0,0,0,.2)}
+.bub .e{font-size:30px}
+.pop{transition:opacity .2s,scale .2s;opacity:0;scale:1.6;pointer-events:none}
+.fl{position:absolute;font-size:26px;font-weight:800;color:#fff;text-shadow:0 2px 4px rgba(0,0,0,.4);pointer-events:none;animation:up .8s forwards}
+@keyframes up{to{transform:translateY(-50px);opacity:0}}
+.ex{display:inline-block;background:var(--bg);border:3px solid var(--line);border-radius:16px;padding:4px 16px;margin:4px;font-size:28px;font-weight:800}
+.ex.y{border-color:var(--ok)}.ex.n{border-color:var(--bad)}
+@media (prefers-reduced-motion:reduce){#area.hurt,.fl{animation:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const SH=[{w:"قِطَّة",e:"🐱"},{w:"بَطَّة",e:"🦆"},{w:"كُرَّة",e:"⚽"},{w:"جَدَّة",e:"👵"},{w:"دُبّ",e:"🐻"},{w:"مُعَلِّم",e:"👨‍🏫"},{w:"طَبَّاخ",e:"👨‍🍳"},{w:"سَيَّارَة",e:"🚗"},{w:"حَقَّ",e:"✅"},{w:"سُكَّر",e:"🍬"}];
+const NO=[{w:"قَمَر",e:"🌙"},{w:"شَمْس",e:"☀️"},{w:"بَيْت",e:"🏠"},{w:"وَرْدَة",e:"🌹"},{w:"نَجْمَة",e:"⭐"},{w:"فِيل",e:"🐘"},{w:"سَمَكَة",e:"🐟"},{w:"شَجَرَة",e:"🌳"},{w:"كِتَاب",e:"📖"},{w:"قَلَم",e:"✏️"}];
+const COL=["#ffe08a","#ffb3c7","#b9f0c8","#d7c4ff","#ffd0a6","#b8ecff"];
+const GOAL=15;
+const $=id=>document.getElementById(id);
+const app=$('app');
+let SND=true,AC=null,VO=null;
+function pv(){try{VO=speechSynthesis.getVoices().find(v=>/^ar/i.test(v.lang))||null}catch(e){}}
+try{pv();speechSynthesis.onvoiceschanged=pv}catch(e){}
+function speak(t){if(!SND)return;try{speechSynthesis.cancel();speechSynthesis.resume();const u=new SpeechSynthesisUtterance(t);u.lang='ar-SA';if(VO)u.voice=VO;u.rate=.8;speechSynthesis.speak(u)}catch(e){}}
+function tone(f,d,t0,ty,f2,v){if(!SND)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state=='suspended')AC.resume();const o=AC.createOscillator(),g=AC.createGain(),s=AC.currentTime+(t0||0);o.type=ty||'sine';o.frequency.setValueAtTime(f,s);if(f2)o.frequency.exponentialRampToValueAtTime(f2,s+d);o.connect(g);g.connect(AC.destination);g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(v||.25,s+.015);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.start(s);o.stop(s+d+.05)}catch(e){}}
+const sPop=c=>{tone(500+Math.min(c,10)*60,.12,0,'sine',1100+Math.min(c,10)*60);tone(1400,.05,.05,'square',null,.06)};
+const sBad=()=>{tone(200,.3,0,'sawtooth',90,.2)};
+const sMiss=()=>{tone(600,.35,0,'triangle',150,.2)};
+const sWin=()=>[523,659,784,1047,784,1047].forEach((f,i)=>tone(f,.2,i*.13,'triangle'));
+const sLose=()=>[392,330,262,196].forEach((f,i)=>tone(f,.28,i*.2,'triangle'));
+const sCombo=()=>{tone(880,.1,.1,'square',null,.08);tone(1175,.15,.2,'square',null,.08)};
+function snd(){SND=!SND;$('sn').textContent=SND?'🔊':'🔇';if(SND)tone(660,.12);else try{speechSynthesis.cancel()}catch(e){}}
+
+let G={};
+function home(){
+ app.innerHTML=`<div class="card"><div style="font-size:64px">🫧</div><h1>فقاعات الشدّة</h1>
+ <p>فقاعات تطفو إلى الأعلى. افقع الكلمات التي فيها <b>شدّة</b> فقط!</p>
+ <p><span class="ex y">قِطَّة ✓</span><span class="ex n">قَمَر ✗</span></p>
+ <p>اجمع ${GOAL} فقاعة صحيحة ولا تخسر قلوبك الثلاثة ❤️<br>🔊 ارفع صوت الجهاز</p>
+ <button class="btn" onclick="start()">ابدأ اللعب</button></div>`;
+}
+function hud(){
+ $('sc').textContent=`⭐ ${G.score} / ${GOAL}`;
+ $('lv').textContent='❤️'.repeat(G.lives)+'🖤'.repeat(3-G.lives);
+ $('cb').textContent=G.combo>=3?`🔥 ×${G.combo}`:'';
+}
+function start(){
+ tone(660,.12);tone(880,.15,.12);
+ app.innerHTML=`<div class="hud"><span id="sc"></span><span id="cb"></span><span id="lv"></span><button class="btn alt sn" id="sn" onclick="snd()">${SND?'🔊':'🔇'}</button></div><div id="area"></div>`;
+ G={score:0,lives:3,combo:0,b:[],run:true,last:performance.now(),spawn:.3};hud();
+ requestAnimationFrame(loop);
+}
+function spawn(){
+ const A=$('area'),it=Math.random()<.5?SH:NO,x0=Math.random()*Math.max(10,A.clientWidth-112);
+ const o=it[Math.floor(Math.random()*it.length)],s=it===SH;
+ const el=document.createElement('button');el.className='bub';el.style.background=COL[Math.floor(Math.random()*COL.length)];
+ el.innerHTML=`<span class="e">${o.e}</span><span>${o.w}</span>`;
+ const b={el,s,w:o.w,x:x0,y:A.clientHeight+10,v:55+Math.random()*30+G.score*3,p:Math.random()*6};
+ el.addEventListener('pointerdown',e=>{e.preventDefault();hit(b)});
+ A.appendChild(el);G.b.push(b);place(b,0);
+}
+function place(b,t){b.el.style.transform=`translate(${b.x+Math.sin(t/600+b.p)*14}px,${b.y}px)`}
+function loop(t){
+ if(!G.run)return;
+ const dt=Math.min(.05,(t-G.last)/1000);G.last=t;G.spawn-=dt;
+ if(G.spawn<=0){spawn();G.spawn=Math.max(.65,1.3-G.score*.04)}
+ for(const b of G.b.slice()){
+  b.y-=b.v*dt;place(b,t);
+  if(b.y<-125){rm(b);if(b.s){sMiss();lose('فاتتك!')}}
+ }
+ if(G.run)requestAnimationFrame(loop);
+}
+function rm(b){G.b=G.b.filter(z=>z!==b);b.el.remove()}
+function fl(b,txt){
+ const f=document.createElement('div');f.className='fl';f.textContent=txt;
+ f.style.left=(b.x+30)+'px';f.style.top=Math.max(10,b.y+30)+'px';$('area').appendChild(f);setTimeout(()=>f.remove(),800);
+}
+function hit(b){
+ if(!G.run||!G.b.includes(b))return;
+ G.b=G.b.filter(z=>z!==b);b.el.classList.add('pop');setTimeout(()=>b.el.remove(),220);
+ if(b.s){
+  G.score++;G.combo++;sPop(G.combo);fl(b,'+1');speak(b.w);
+  if(G.combo>0&&G.combo%3==0)sCombo();
+  hud();if(G.score>=GOAL)end(true);
+ }else{sBad();fl(b,'✗ ليس فيها شدّة');lose()}
+}
+function lose(){
+ G.lives--;G.combo=0;hud();
+ const A=$('area');if(A){A.classList.remove('hurt');void A.offsetWidth;A.classList.add('hurt')}
+ if(G.lives<=0)end(false);
+}
+function end(win){
+ if(!G.run)return;G.run=false;
+ setTimeout(win?sWin:sLose,150);
+ app.innerHTML=`<div class="card"><div style="font-size:72px">${win?'🏆':'🫧'}</div>
+ <h1>${win?'أحسنت! أنت بطل الشدّة':'حاول مرّة أخرى'}</h1>
+ <p>⭐ ${G.score} / ${GOAL}</p>
+ <p>${win?'عرفتَ الكلمات التي فيها شدّة!':'تذكّر: الشدّة علامة ( ّ ) فوق الحرف.'}</p>
+ <button class="btn" onclick="start()">العب مرّة أخرى</button>
+ <button class="btn alt" onclick="home()">القائمة</button></div>`;
+}
+home();
+</script>
+</body>
+</html>

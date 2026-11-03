@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة بستان المدود</title>
+  <style>
+    :root {
+      --primary-color: #2e7d32;
+      --secondary-color: #fbc02d;
+      --bg-color: #f1f8e9;
+      --card-bg: #ffffff;
+      --text-color: #1b5e20;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .game-container {
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 650px;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-top: 0;
+      font-size: 2rem;
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background: #ded2f9;
+      padding: 10px 20px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      border: 2px solid #c5cae9;
+      color: #4a148c;
+    }
+
+    .question-card {
+      background: #e8f5e9;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 25px;
+      border: 3px solid #81c784;
+    }
+
+    .target-prompt {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #2e7d32;
+      margin-bottom: 10px;
+    }
+
+    .target-word {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: #e65100;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .btn-option {
+      background: #ffffff;
+      border: 3px solid #a5d6a7;
+      border-radius: 20px;
+      padding: 20px 10px;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-option:hover {
+      transform: translateY(-4px);
+      border-color: #2e7d32;
+      background: #f1f8e9;
+    }
+
+    .flower-icon {
+      font-size: 2rem;
+    }
+
+    .result-modal {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .result-modal h2 {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
+    .btn-reset {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+    }
+
+    .btn-reset:hover {
+      background: #1b5e20;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <h1>🌸 بستان المدود</h1>
+
+    <div class="score-board">
+      <span>النقاط: <span id="score">0</span> 🌟</span>
+      <span>السؤال: <span id="question-num">1</span> / 10 🎯</span>
+    </div>
+
+    <div class="question-card">
+      <div class="target-prompt" id="target-prompt">حدد نوع المد في الكلمة التالية:</div>
+      <div class="target-word" id="target-word">كِتَاب</div>
+    </div>
+
+    <div class="options-grid" id="options-container">
+      <!-- الخيارات ستولد بالجاڤاسكريبت -->
+    </div>
+
+    <div class="result-modal" id="result-modal">
+      <h2>🎉 بطل البستان! 🎉</h2>
+      <p style="font-size: 1.3rem; margin-bottom: 20px;">أتقنت التمييز بين أنواع المدود بنجاح!</p>
+      <p style="font-size: 1.5rem; font-weight: bold;">النتيجة النهائية: <span id="final-score">0</span> / 10</p>
+      <button class="btn-reset" onclick="startGame()">العب مرة أخرى 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // قاعدة بيانات الكلمات والمدود (نظيفة وآمنة تماماً للأطفال)
+    const questionsDatabase = [
+      { word: "كِتَاب", correctType: "مد بالألف", options: ["مد بالألف", "مد بالواو", "مد بالياء"] },
+      { word: "طَبِيب", correctType: "مد بالياء", options: ["مد بالألف", "مد بالواو", "مد بالياء"] },
+      { word: "عُصْفُور", correctType: "مد بالواو", options: ["مد بالألف", "مد بالواو", "مد بالياء"] },
+      { word: "سَحَاب", correctType: "مد بالألف", options: ["مد بالألف", "مد بالواو", "مد بالياء"] },
+      { word: "صَدِيق", correctType: "مد بالياء", options: ["مد بالألف", "مد بالواو", "مد بالياء"] },
+      { word: "لَيْمُون", correctType: "مد بالواو", options: ["مد بالألف", "مد بالواو", "مد بالياء"] },
+      { word: "تِمْسَاح", correctType: "مد بالألف", options: ["مد بالألف", "مد بالواو", "مد بالياء"] },
+      { word: "سَرِير", correctType: "مد بالياء", options: ["مد بالألف", "مد بالواو", "مد بالياء"] },
+      { word: "نُجُوم", correctType: "مد بالواو", options: ["مد بالألف", "مد بالواو", "مد بالياء"] },
+      { word: "حَضَانَة", correctType: "مد بالألف", options: ["مد بالألف", "مد بالواو", "مد بالياء"] }
+    ];
+
+    let currentQuestions = [];
+    let currentStep = 0;
+    let score = 0;
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(90, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      }
+    }
+
+    function startGame() {
+      currentQuestions = [...questionsDatabase].sort(() => Math.random() - 0.5);
+      currentStep = 0;
+      score = 0;
+      document.getElementById("score").innerText = score;
+      document.getElementById("result-modal").style.display = "none";
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentStep >= currentQuestions.length) {
+        showResults();
+        return;
+      }
+
+      const q = currentQuestions[currentStep];
+      document.getElementById("question-num").innerText = currentStep + 1;
+      document.getElementById("target-word").innerText = q.word;
+
+      const optionsContainer = document.getElementById("options-container");
+      optionsContainer.innerHTML = "";
+
+      const flowers = ["🌷", "🌻", "🌺"];
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "btn-option";
+        btn.innerHTML = `<span class="flower-icon">${flowers[idx]}</span> <span>${opt}</span>`;
+        btn.onclick = () => checkAnswer(opt, q.correctType, btn);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selected, correct, btn) {
+      if (selected === correct) {
+        playSound('correct');
+        score += 1;
+        document.getElementById("score").innerText = score;
+        btn.style.backgroundColor = "#c8e6c9";
+        btn.style.borderColor = "#4caf50";
+
+        setTimeout(() => {
+          currentStep++;
+          loadQuestion();
+        }, 800);
+      } else {
+        playSound('wrong');
+        btn.style.backgroundColor = "#ffcdd2";
+        btn.style.borderColor = "#f44336";
+        btn.disabled = true;
+      }
+    }
+
+    function showResults() {
+      document.getElementById("final-score").innerText = score;
+      document.getElementById("result-modal").style.display = "flex";
+    }
+
+    window.onload = startGame;
+  </script>
+</body>
+</html>

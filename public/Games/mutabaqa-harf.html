@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة مطابقة الصورة بالحرف</title>
+  <style>
+    :root {
+      --primary-color: #3f51b5;
+      --secondary-color: #009688;
+      --bg-color: #e8eaf6;
+      --card-bg: #ffffff;
+      --text-color: #1a237e;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .game-container {
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 650px;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-top: 0;
+      font-size: 2rem;
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background: #c5cae9;
+      padding: 10px 20px;
+      border-radius: 50px;
+      margin-bottom: 20px;
+      border: 2px solid #9fa8da;
+    }
+
+    .image-box {
+      background: #f3e5f5;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: inset 0 4px 8px rgba(0,0,0,0.05);
+      border: 3px dashed #ab47bc;
+    }
+
+    .target-emoji {
+      font-size: 5rem;
+      margin-bottom: 10px;
+      animation: bounceItem 2s infinite;
+    }
+
+    @keyframes bounceItem {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .target-word {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #7b1fa2;
+    }
+
+    .instructions {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      color: #3f51b5;
+      font-weight: bold;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .btn-option {
+      background: #ffffff;
+      border: 3px solid #90caf9;
+      border-radius: 16px;
+      padding: 15px;
+      font-size: 2.2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    }
+
+    .btn-option:hover {
+      transform: translateY(-4px);
+      border-color: var(--secondary-color);
+      background: #e0f2f1;
+    }
+
+    .result-modal {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .result-modal h2 {
+      font-size: 2.5rem;
+      color: var(--secondary-color);
+      margin-bottom: 10px;
+    }
+
+    .btn-reset {
+      background: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0, 150, 136, 0.4);
+    }
+
+    .btn-reset:hover {
+      background: #00796b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <h1>🎨 مطابقة الصورة بالحرف</h1>
+
+    <div class="score-board">
+      <span>النقاط: <span id="score">0</span> 🌟</span>
+      <span>السؤال: <span id="question-num">1</span> / 10 🎯</span>
+    </div>
+
+    <div class="instructions">ما هو الحرف الأول لهذه الكلمة؟</div>
+
+    <div class="image-box">
+      <div class="target-emoji" id="target-emoji">🦁</div>
+      <div class="target-word" id="target-word">أَسَد</div>
+    </div>
+
+    <div class="options-grid" id="options-container">
+      <!-- الخيارات ستولد بالجاڤاسكريبت -->
+    </div>
+
+    <div class="result-modal" id="result-modal">
+      <h2>🎉 رائع جداً! 🎉</h2>
+      <p style="font-size: 1.3rem; margin-bottom: 20px;">أتممت لعبة مطابقة الصور بنجاح!</p>
+      <p style="font-size: 1.5rem; font-weight: bold;">النتيجة النهائية: <span id="final-score">0</span> / 10</p>
+      <button class="btn-reset" onclick="startGame()">العب مرة أخرى 🔄</button>
+    </div>
+  </div>
+
+  <script>
+    // قاعدة بيانات الصور والحروف الأولى
+    const questionsDatabase = [
+      { emoji: "🦁", word: "أَسَد", correctLetter: "أ", options: ["أ", "ب", "ج"] },
+      { emoji: "🦆", word: "بَطَّة", correctLetter: "ب", options: ["ت", "ب", "ث"] },
+      { emoji: "🍎", word: "تُفَّاح", correctLetter: "ت", options: ["ب", "ت", "ن"] },
+      { emoji: "🦊", word: "ثَعْلَب", correctLetter: "ث", options: ["ت", "ث", "ج"] },
+      { emoji: "🐪", word: "جَمَل", correctLetter: "ج", options: ["ج", "ح", "خ"] },
+      { emoji: "🐎", word: "حِصَان", correctLetter: "ح", options: ["ج", "ح", "خ"] },
+      { emoji: "🍒", word: "كَرَز", correctLetter: "ك", options: ["ق", "ك", "ل"] },
+      { emoji: "🌹", word: "وَرْدَة", correctLetter: "و", options: ["و", "م", "ب"] },
+      { emoji: "🪟", word: "شُبَّاك", correctLetter: "ش", options: ["س", "ش", "ص"] },
+      { emoji: "🌞", word: "شَمْس", correctLetter: "ش", options: ["ش", "س", "ز"] }
+    ];
+
+    let currentQuestions = [];
+    let currentStep = 0;
+    let score = 0;
+
+    // الأصوات باستخدام Web Audio API
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'correct') {
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.2); // A5
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } else if (type === 'wrong') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      }
+    }
+
+    function startGame() {
+      currentQuestions = [...questionsDatabase].sort(() => Math.random() - 0.5);
+      currentStep = 0;
+      score = 0;
+      document.getElementById("score").innerText = score;
+      document.getElementById("result-modal").style.display = "none";
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentStep >= currentQuestions.length) {
+        showResults();
+        return;
+      }
+
+      const q = currentQuestions[currentStep];
+      document.getElementById("question-num").innerText = currentStep + 1;
+      document.getElementById("target-emoji").innerText = q.emoji;
+      document.getElementById("target-word").innerText = q.word;
+
+      // خلط خيارات الحروف عشوائياً
+      const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+
+      const optionsContainer = document.getElementById("options-container");
+      optionsContainer.innerHTML = "";
+
+      shuffledOptions.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.className = "btn-option";
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(opt, q.correctLetter, btn);
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(selectedLetter, correctLetter, btn) {
+      if (selectedLetter === correctLetter) {
+        playSound('correct');
+        score += 1;
+        document.getElementById("score").innerText = score;
+        btn.style.backgroundColor = "#c8e6c9";
+        btn.style.borderColor = "#4caf50";
+
+        setTimeout(() => {
+          currentStep++;
+          loadQuestion();
+        }, 800);
+      } else {
+        playSound('wrong');
+        btn.style.backgroundColor = "#ffcdd2";
+        btn.style.borderColor = "#f44336";
+        btn.disabled = true;
+      }
+    }
+
+    function showResults() {
+      document.getElementById("final-score").innerText = score;
+      document.getElementById("result-modal").style.display = "flex";
+    }
+
+    window.onload = startGame;
+  </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة صيد الحروف الأبجدية</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Tone.js for Sound Effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        /* Underwater Bubble Animations */
+        @keyframes floatUp {
+            0% {
+                transform: translateY(110vh) scale(0.8) rotate(0deg);
+                opacity: 0.9;
+            }
+            50% {
+                transform: translateY(55vh) scale(1.05) rotate(10deg);
+            }
+            100% {
+                transform: translateY(-20vh) scale(0.9) rotate(-10deg);
+                opacity: 0.2;
+            }
+        }
+
+        .bubble-item {
+            position: absolute;
+            will-change: transform;
+            animation-name: floatUp;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+
+        /* Pop Animation when clicked */
+        @keyframes pop {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.8; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        .popping {
+            animation: pop 0.25s ease-out forwards !important;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-sky-400 via-sky-500 to-indigo-900 text-white min-h-screen h-screen w-screen overflow-hidden flex flex-col justify-between relative">
+
+    <!-- Header Stats Bar -->
+    <header class="p-4 bg-sky-900/40 backdrop-blur-md border-b border-sky-300/30 flex justify-between items-center z-20 shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-400 border-2 border-amber-200 text-amber-900 flex items-center justify-center font-extrabold text-2xl shadow-lg shadow-amber-500/30">
+                <i class="fa-solid fa-fish-fins"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-extrabold leading-tight">لُعْبَةُ صَيْدِ الحُرُوفِ</h1>
+                <p class="text-xs text-sky-200 font-semibold">اصطَدِ الحَرْفَ المَطْلُوبَ قَبْلَ أَنْ يَهْرُبَ!</p>
+            </div>
+        </div>
+
+        <!-- Target Letter Display Box -->
+        <div class="bg-white/90 backdrop-blur-sm px-6 py-1.5 rounded-2xl border-4 border-amber-400 shadow-xl text-slate-800 flex items-center gap-3 animate-pulse">
+            <span class="text-xs font-bold text-slate-500">الحَرْفُ المَطْلُوبُ:</span>
+            <span id="targetLetter" class="text-4xl font-black text-amber-600">أ</span>
+            <button onclick="speakTargetLetter()" title="استمع للحرف" class="p-2 text-sky-600 hover:text-sky-800 bg-sky-100 rounded-xl hover:scale-110 transition-transform">
+                <i class="fa-solid fa-volume-high text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Score & Hearts -->
+        <div class="flex items-center gap-6">
+            <!-- Score -->
+            <div class="flex flex-col items-end">
+                <span class="text-xs text-sky-200 font-bold">النِّقَاطُ</span>
+                <span id="scoreDisplay" class="text-3xl font-black text-amber-300 drop-shadow">0</span>
+            </div>
+            <!-- Hearts -->
+            <div id="heartsContainer" class="flex gap-1 text-rose-400 text-xl">
+                <i class="fa-solid fa-heart"></i>
+                <i class="fa-solid fa-heart"></i>
+                <i class="fa-solid fa-heart"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Ocean Area -->
+    <main id="oceanContainer" class="relative flex-1 w-full h-full overflow-hidden cursor-crosshair">
+        <!-- Bubbles with letters will be dynamically injected here -->
+    </main>
+
+    <!-- Start / GameOver / Victory Modal Overlay -->
+    <div id="gameModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-40 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border-4 border-sky-400 rounded-3xl p-8 max-w-md w-full text-center shadow-2xl relative overflow-hidden">
+            <div class="w-20 h-20 bg-amber-400 rounded-full flex items-center justify-center text-amber-950 text-4xl mx-auto mb-4 border-4 border-amber-200 shadow-lg shadow-amber-500/40">
+                <i id="modalIcon" class="fa-solid fa-trophy"></i>
+            </div>
+            
+            <h2 id="modalTitle" class="text-2xl font-black text-white mb-2">مَرْحَبَاً بِكَ فِي لُعْبَةِ صَيْدِ الحُرُوفِ!</h2>
+            <p id="modalDesc" class="text-sky-200 text-sm mb-6 font-semibold leading-relaxed">
+                اضغَطْ عَلَى البَالُونَاتِ وَالفُقَّاعَاتِ الَّتِي تَحْمِلُ الحَرْفَ المَطْلُوبَ لِتَجْمَعَ النِّقَاطَ وَتُصْبِحَ بَطَلَ الحُرُوفِ!
+            </p>
+
+            <button onclick="startGame()" class="w-full py-3.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-900 rounded-2xl font-black text-xl shadow-xl hover:scale-105 active:scale-95 transition-all">
+                ابدَأِ اللَّعِبَ الآنَ 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- Script Implementation -->
+    <script>
+        const lettersList = ['أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'هـ', 'و', 'ي'];
+        
+        let targetLetter = '';
+        let score = 0;
+        let lives = 3;
+        let gameActive = false;
+        let spawnInterval = null;
+
+        const oceanContainer = document.getElementById('oceanContainer');
+        const targetLetterEl = document.getElementById('targetLetter');
+        const scoreDisplayEl = document.getElementById('scoreDisplay');
+        const heartsContainerEl = document.getElementById('heartsContainer');
+        const gameModalEl = document.getElementById('gameModal');
+
+        // Sound Effects via Tone.js
+        function playPopSound(isCorrect) {
+            if (!window.Tone) return;
+            Tone.start();
+
+            if (isCorrect) {
+                const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+                synth.volume.value = -8;
+                synth.triggerAttackRelease(["C5", "E5", "G5"], "8n");
+            } else {
+                const synth = new Tone.MembraneSynth().toDestination();
+                synth.volume.value = -4;
+                synth.triggerAttackRelease("C2", "8n");
+            }
+        }
+
+        function speakTargetLetter() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(targetLetter);
+                utterance.lang = 'ar-SA';
+                utterance.rate = 0.8;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function startGame() {
+            score = 0;
+            lives = 3;
+            gameActive = true;
+            oceanContainer.innerHTML = '';
+            
+            updateScoreAndLives();
+            nextRound();
+            
+            gameModalEl.classList.add('hidden');
+
+            if (spawnInterval) clearInterval(spawnInterval);
+            spawnInterval = setInterval(() => {
+                if (gameActive) spawnBubble();
+            }, 900);
+        }
+
+        function nextRound() {
+            targetLetter = lettersList[Math.floor(Math.random() * lettersList.length)];
+            targetLetterEl.innerText = targetLetter;
+            speakTargetLetter();
+        }
+
+        function updateScoreAndLives() {
+            scoreDisplayEl.innerText = score;
+            
+            let heartsHTML = '';
+            for (let i = 0; i < 3; i++) {
+                if (i < lives) {
+                    heartsHTML += '<i class="fa-solid fa-heart text-rose-500"></i>';
+                } else {
+                    heartsHTML += '<i class="fa-regular fa-heart text-slate-400/50"></i>';
+                }
+            }
+            heartsContainerEl.innerHTML = heartsHTML;
+        }
+
+        function spawnBubble() {
+            const bubble = document.createElement('div');
+            
+            // Randomize whether this bubble carries the target letter or a distractor
+            const isTarget = Math.random() < 0.45;
+            let letterVal = isTarget ? targetLetter : lettersList[Math.floor(Math.random() * lettersList.length)];
+            
+            const size = Math.floor(Math.random() * 25) + 65; // size between 65px and 90px
+            const startLeft = Math.random() * (oceanContainer.clientWidth - size - 20) + 10;
+            const duration = Math.random() * 3 + 4.5; // 4.5s to 7.5s speed
+
+            const colorGradients = [
+                'from-sky-300/80 to-blue-500/80 border-sky-200',
+                'from-emerald-300/80 to-teal-500/80 border-emerald-200',
+                'from-amber-300/80 to-orange-500/80 border-amber-200',
+                'from-purple-300/80 to-indigo-500/80 border-purple-200',
+                'from-pink-300/80 to-rose-500/80 border-pink-200'
+            ];
+            const randomColor = colorGradients[Math.floor(Math.random() * colorGradients.length)];
+
+            bubble.className = `bubble-item absolute rounded-full border-4 shadow-2xl backdrop-blur-xs flex items-center justify-center font-black text-3xl text-white cursor-pointer hover:scale-110 active:scale-90 bg-gradient-to-br ${randomColor}`;
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            bubble.style.left = `${startLeft}px`;
+            bubble.style.animationDuration = `${duration}s`;
+
+            bubble.innerText = letterVal;
+
+            bubble.addEventListener('click', (e) => {
+                if (!gameActive) return;
+
+                if (letterVal === targetLetter) {
+                    playPopSound(true);
+                    score += 10;
+                    bubble.classList.add('popping');
+                    setTimeout(() => bubble.remove(), 250);
+
+                    updateScoreAndLives();
+
+                    // Every 30 points change target letter
+                    if (score % 30 === 0) {
+                        nextRound();
+                    }
+                } else {
+                    playPopSound(false);
+                    lives--;
+                    bubble.classList.add('popping');
+                    setTimeout(() => bubble.remove(), 250);
+
+                    updateScoreAndLives();
+
+                    if (lives <= 0) {
+                        endGame(false);
+                    }
+                }
+            });
+
+            // Cleanup offscreen bubbles
+            bubble.addEventListener('animationend', () => {
+                bubble.remove();
+            });
+
+            oceanContainer.appendChild(bubble);
+        }
+
+        function endGame(won) {
+            gameActive = false;
+            if (spawnInterval) clearInterval(spawnInterval);
+
+            document.getElementById('modalIcon').className = won ? 'fa-solid fa-trophy' : 'fa-solid fa-face-sad-tear';
+            document.getElementById('modalTitle').innerText = won ? 'فَوْزٌ رَائِعٌ! 🏆' : 'اِنْتَهَتِ اللَّعْبَةُ! 💔';
+            document.getElementById('modalDesc').innerText = `مَجْمُوعُ نِقَاطِكَ النهائي هُوَ: ${score} نُقْطَةً. هَلْ تَرغَبُ فِي التَّحَدِّي مَرَّةً أُخْرَى؟`;
+
+            gameModalEl.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
