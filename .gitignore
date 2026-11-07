@@ -1,0 +1,11 @@
+# بيانات وأسرار — مكانها DATA_DIR، مش الريبو
+data/
+*.json.tmp
+auth*.json
+sessions.json
+telegram.json
+backup-state.json
+schedule.json
+data-*.json
+.env
+node_modules/

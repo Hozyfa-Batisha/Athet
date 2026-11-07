@@ -4,7 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const OUT = path.join(__dirname, 'public', 'audio');
+const OUT = path.join(__dirname, '..', 'public', 'audio');
 const BASE_HOST = process.env.EVERYAYAH_BASE || 'https://everyayah.com/data/';
 const STYLES = {
   muallim: 'Husary_Muallim_128kbps',
