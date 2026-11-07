@@ -58,7 +58,14 @@ function readBody(req, res, limit, cb) {
     }
     chunks.push(c);
   });
-  req.on('end', () => { if (!done) { done = true; cb(Buffer.concat(chunks).toString('utf8')); } });
+  req.on('end', () => {
+    if (done) return;
+    done = true;
+    try { cb(Buffer.concat(chunks).toString('utf8')); } catch (e) { // خطأ في طلب واحد مايوقعش السيرفر كله
+      console.error('[error]', req.method, req.url, e);
+      if (!res.headersSent) { res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' }); res.end('حصل خطأ في السيرفر، جرّب تاني.'); }
+    }
+  });
   req.on('error', () => { done = true; });
 }
 const parseJson = s => { try { return JSON.parse(s); } catch { return null; } };

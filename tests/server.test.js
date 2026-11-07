@@ -105,3 +105,12 @@ test('oversized body gets 413 instead of a dropped connection', async () => {
   const r = await post('/login', 'x'.repeat(20000));
   assert.equal(r.status, 413);
 });
+
+test('a write failure returns 500 and does not crash the server', async () => {
+  fs.chmodSync(DATA, 0o500);                       // data dir becomes read-only
+  try {
+    const r = await fetch(base + '/api/schedule', { method: 'POST', headers: { Cookie: sid }, body: '{"a":1}' });
+    assert.equal(r.status, 500);
+  } finally { fs.chmodSync(DATA, 0o700); }
+  assert.equal((await fetch(base + '/healthz')).status, 200, 'server still alive');
+});
