@@ -10,9 +10,9 @@ const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.mp3': 'audio/mpeg', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8',
-  '.woff2': 'font/woff2',
+  '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json; charset=utf-8',
 };
-const COMPRESSIBLE = new Set(['.html', '.js', '.css', '.json', '.svg', '.txt']);
+const COMPRESSIBLE = new Set(['.html', '.js', '.css', '.json', '.svg', '.txt', '.webmanifest']);
 const cache = new Map(); // filePath -> { mtimeMs, br, gzip, etag }
 
 function compressed(filePath, st) {

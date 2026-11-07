@@ -8,6 +8,8 @@ const views = require('./views');
 const backup = require('./backup');
 const { serveStatic } = require('./static');
 
+const PUBLIC_PATHS = /^\/(favicon\.ico|manifest\.webmanifest|icons\/[\w.-]+)$/;
+
 /* ---------- أدوات ---------- */
 function clientIp(req) {
   if (cfg.TRUST_PROXY) {
@@ -87,6 +89,8 @@ async function handle(req, res) {
   const M = req.method;
 
   if (url === '/healthz') return json(res, { ok: true });
+  // الأيقونات والـ manifest متاحين من غير تسجيل (تاب المتصفح، صفحة الدخول، الشاشة الرئيسية للموبايل)
+  if ((M === 'GET' || M === 'HEAD') && PUBLIC_PATHS.test(url)) return serveStatic(req, res, url);
 
   // --- صفحات الدخول (متاحة بدون تسجيل) ---
   if (url === '/login' && M === 'GET') {

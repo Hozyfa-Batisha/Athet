@@ -114,3 +114,11 @@ test('a write failure returns 500 and does not crash the server', async () => {
   } finally { fs.chmodSync(DATA, 0o700); }
   assert.equal((await fetch(base + '/healthz')).status, 200, 'server still alive');
 });
+
+test('icons and manifest load without a session; other files do not', async () => {
+  for (const p of ['/favicon.ico', '/icons/icon.svg', '/icons/icon-512.png', '/manifest.webmanifest']) {
+    assert.equal((await fetch(base + p)).status, 200, p);
+  }
+  assert.equal((await fetch(base + '/css/app.css', { redirect: 'manual' })).status, 302);
+  assert.match(await (await fetch(base + '/login')).text(), /rel="icon"/);
+});
