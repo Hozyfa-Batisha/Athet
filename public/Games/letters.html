@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f9f7f2" />
+    <meta
+      name="description"
+      content="مغامرة ممتعة لتعلّم الحروف العربية: اسمع الحرف، اكتشف كلمة، واختبر مهارتك في لعبة الاستماع."
+    />
+    <title>حروفي — كل حرف مغامرة</title>
+
+    <script id="app-bootstrap" type="application/json">
+      __ATHAR_BOOTSTRAP_JSON__
+    </script>
+    <script src="/js/bootstrap.js"></script>
+    <script src="/games/js/letters-theme.js"></script>
+
+    <link rel="stylesheet" href="/games/styles/letters.css" />
+  </head>
+  <body>
+    <svg class="svg-defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="i-sound" viewBox="0 0 24 24">
+        <path
+          d="M11 5 6 9H3v6h3l5 4V5Zm4 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"
+        />
+      </symbol>
+      <symbol id="i-star" viewBox="0 0 24 24">
+        <path
+          d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"
+        />
+      </symbol>
+      <symbol id="i-book" viewBox="0 0 24 24">
+        <path
+          d="M12 6v15m0-15C9 3 5 3 2 4v15c4-1 7 0 10 2m0-15c3-3 7-3 10-2v15c-4-1-7 0-10 2"
+        />
+      </symbol>
+      <symbol id="i-game" viewBox="0 0 24 24">
+        <path
+          d="M7 7h10c3 0 5 10 3 12-2 2-5-3-6-3h-4c-1 0-4 5-6 3C2 17 4 7 7 7Zm0 4v4m-2-2h4m7-2h.01m2 3h.01"
+        />
+      </symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24">
+        <path d="m14 6-6 6 6 6M8 12h13" />
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24">
+        <path d="m5 12 4 4L19 6" />
+      </symbol>
+      <symbol id="i-trophy" viewBox="0 0 24 24">
+        <path
+          d="M7 3h10v6a5 5 0 0 1-10 0V3Zm0 2H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4m-5 2v5m-4 2h8"
+        />
+      </symbol>
+    </svg>
+    <header class="site-header">
+      <div class="header-inner">
+        <a
+          class="brand"
+          href="/games/portal.html"
+          aria-label="حروفي، الصفحة الرئيسية"
+          ><span class="brand-mark">ح<span></span></span
+          ><span>حروفي<span class="brand-dot">.</span></span></a
+        >
+        <nav class="desktop-nav" aria-label="القائمة الرئيسية">
+          <a
+            class="nav-link"
+            href="/games/portal.html"
+            style="text-decoration: none; display: flex; align-items: center"
+            >كلّ الألعاب</a
+          >
+          <button data-view="learn" class="nav-link active" aria-current="page">
+            تعلّم الحروف
+          </button>
+          <button data-view="play" class="nav-link">العب واكتشف</button>
+          <button data-view="progress" class="nav-link">إنجازاتي</button>
+        </nav>
+        <div class="legacy-header-actions">
+          <button
+            id="legacy-theme-toggle"
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="تفعيل الوضع الداكن"
+            aria-pressed="false"
+          >
+            <span data-theme-icon aria-hidden="true">☾</span
+            ><span class="visually-hidden" data-theme-label
+              >الوضع الداكن</span
+            ></button
+          ><button
+            id="legacy-sound"
+            class="legacy-sound"
+            aria-label="كتم الصوت"
+            aria-pressed="false"
+          >
+            <svg><use href="#i-sound" /></svg>
+          </button>
+          <div class="header-star">
+            <svg><use href="#i-star" /></svg><span id="star-total">٠</span
+            ><span>نجمة</span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <div class="eyebrow">
+            <span class="little-spark">✦</span> لكل طفلٍ فضوليّ
+          </div>
+          <h1 id="hero-title">
+            حروف صغيرة،
+            <span>مغامرات كبيرة<span class="title-spark">✧</span></span>
+          </h1>
+          <p>اسمع، اكتشف، والعب… رحلتك مع الحروف تبدأ هنا!</p>
+        </div>
+        <div class="letter-friends" aria-hidden="true">
+          <span class="doodle d1">✧</span><span class="doodle d2">✦</span
+          ><span class="doodle d3">✧</span>
+          <span class="friend friend-one"
+            >أ<i class="eyes"><i></i><i></i></i><i class="smile"></i
+          ></span>
+          <span class="friend friend-two"
+            >ب<i class="eyes"><i></i><i></i></i><i class="smile"></i
+          ></span>
+          <span class="friend friend-three"
+            >ت<i class="eyes"><i></i><i></i></i><i class="smile"></i
+          ></span>
+          <span class="hero-scribble">يا أهلًا بالأبطال!</span>
+          <svg class="scribble-arrow" viewBox="0 0 80 42">
+            <path d="M5 4c12 27 47 31 65 13m-17 1 18-2-5 15" />
+          </svg>
+        </div>
+      </section>
+      <div class="workspace-toolbar">
+        <div class="mode-tabs" role="tablist" aria-label="اختر النشاط">
+          <button
+            id="tab-learn"
+            role="tab"
+            aria-selected="true"
+            aria-controls="learn-view"
+            class="mode-tab active"
+            data-view="learn"
+          >
+            <svg><use href="#i-book" /></svg>نتعلّم
+          </button>
+          <button
+            id="tab-play"
+            role="tab"
+            aria-selected="false"
+            aria-controls="play-view"
+            class="mode-tab"
+            data-view="play"
+          >
+            <svg><use href="#i-game" /></svg>نلعب
+          </button>
+        </div>
+        <span class="gentle-note"
+          ><span class="green-dot"></span> على مهلك… كل خطوة إنجاز</span
+        >
+      </div>
+
+      <section
+        id="learn-view"
+        class="view"
+        role="tabpanel"
+        aria-labelledby="tab-learn"
+      >
+        <div class="learning-layout">
+          <article class="lesson-card">
+            <div class="lesson-topline">
+              <span id="letter-position">الحرف ١ من ٢٨</span
+              ><span class="lesson-label">لنتعرّف على</span>
+            </div>
+            <div class="letter-stage" id="letter-stage">
+              <span class="stage-spark s1">✦</span
+              ><span class="stage-spark s2">✧</span
+              ><span class="stage-dot"></span>
+              <span id="big-letter" class="big-letter">ا</span>
+              <button
+                class="round-sound"
+                id="listen-main"
+                aria-label="اسمع حرف ألف"
+              >
+                <svg><use href="#i-sound" /></svg>
+              </button>
+              <span id="letter-name" class="letter-name">أَلِف</span>
+            </div>
+            <div class="example-row">
+              <div class="example-art" id="example-art" aria-hidden="true">
+                🦁
+              </div>
+              <div class="example-copy">
+                <span>مثل كلمة</span><strong id="example-word">أَسَد</strong>
+              </div>
+              <button
+                class="example-listen"
+                id="listen-word"
+                aria-label="اسمع كلمة أسد"
+              >
+                <svg><use href="#i-sound" /></svg>
+              </button>
+            </div>
+            <button class="primary-button listen-button" id="listen-letter">
+              <svg><use href="#i-sound" /></svg><span>اسمع الحرف</span
+              ><span class="sound-bars" aria-hidden="true"
+                ><i></i><i></i><i></i
+              ></span>
+            </button>
+            <div class="lesson-navigation">
+              <button id="previous-letter" class="text-button">
+                <svg class="flipped"><use href="#i-arrow" /></svg>السابق</button
+              ><span class="lesson-dots" aria-hidden="true"
+                ><i class="active"></i><i></i><i></i></span
+              ><button id="next-letter" class="text-button">
+                التالي<svg><use href="#i-arrow" /></svg>
+              </button>
+            </div>
+          </article>
+          <article class="alphabet-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>أصدقاؤنا الحروف</h2>
+                <p>اضغط على أي حرف لتسمع اسمه</p>
+              </div>
+              <span class="count-label">٢٨ حرفًا</span>
+            </div>
+            <div
+              id="alphabet-grid"
+              class="alphabet-grid"
+              aria-label="الحروف العربية"
+            ></div>
+            <div class="learn-progress">
+              <span
+                ><span class="mini-spark">✦</span> اكتشفت
+                <b id="learned-count">٠</b> من ٢٨ حرفًا</span
+              >
+              <div
+                class="progress-track"
+                role="progressbar"
+                aria-label="الحروف المكتشفة"
+                aria-valuemin="0"
+                aria-valuemax="28"
+                aria-valuenow="0"
+                id="learn-progress"
+              >
+                <span id="learn-progress-fill"></span>
+              </div>
+              <span class="progress-caption" id="progress-caption"
+                >بداية جميلة!</span
+              >
+            </div>
+          </article>
+        </div>
+        <button class="challenge-banner" data-view="play">
+          <span class="banner-icon"
+            ><svg><use href="#i-game" /></svg></span
+          ><span class="banner-copy"
+            ><strong>جاهز لتحدٍّ صغير؟</strong
+            ><span>اسمع الحرف، واعثر عليه… واجمع النجوم!</span></span
+          ><span class="banner-cta"
+            >هيا نلعب<svg><use href="#i-arrow" /></svg></span
+          ><span class="banner-doodle" aria-hidden="true">✧</span>
+        </button>
+      </section>
+
+      <section
+        id="play-view"
+        class="view"
+        role="tabpanel"
+        aria-labelledby="tab-play"
+        hidden
+      >
+        <article class="game-card" id="game-card">
+          <div class="game-intro" id="game-intro">
+            <span class="big-game-icon">✦</span
+            ><span class="small-kicker">تحدّي الاستماع</span>
+            <h2>أُذُن تسمع، وعين تكتشف!</h2>
+            <p>
+              استمع إلى اسم الحرف، ثم اختر شكله الصحيح.<br />١٠ أسئلة ممتعة… كم
+              نجمة ستجمع؟
+            </p>
+            <button class="primary-button" id="start-game">
+              <svg><use href="#i-game" /></svg>ابدأ المغامرة</button
+            ><span class="quiet-note">لا يوجد وقت محدّد. خذ راحتك ♡</span>
+          </div>
+          <div id="game-round" hidden>
+            <div class="game-topline">
+              <span id="round-count">السؤال ١ من ١٠</span
+              ><span class="game-score"
+                ><svg><use href="#i-star" /></svg
+                ><b id="round-score">٠</b> نجوم</span
+              >
+            </div>
+            <div class="round-track"><span id="round-progress"></span></div>
+            <h2>أيّ حرف سمعت؟</h2>
+            <p class="game-help" id="game-help">
+              اضغط على زر الصوت، ثم اختر الحرف
+            </p>
+            <button
+              class="quiz-listen"
+              id="quiz-listen"
+              aria-label="استمع إلى حرف السؤال"
+            >
+              <svg><use href="#i-sound" /></svg><span>اسمع الحرف</span>
+            </button>
+            <div class="choices" id="quiz-choices"></div>
+            <div
+              class="game-feedback"
+              id="game-feedback"
+              aria-live="polite"
+            ></div>
+            <button id="next-round" class="primary-button" hidden>
+              السؤال التالي<svg><use href="#i-arrow" /></svg>
+            </button>
+          </div>
+          <div id="game-result" class="game-result" hidden>
+            <div class="result-stars" aria-hidden="true">✦ ★ ✦</div>
+            <span class="small-kicker">أنهيت المغامرة!</span>
+            <h2 id="result-title">أحسنت يا بطل!</h2>
+            <p id="result-description"></p>
+            <div class="result-score" id="result-score"></div>
+            <div class="result-buttons">
+              <button class="primary-button" id="play-again">
+                نلعب مرّة أخرى<svg><use href="#i-game" /></svg></button
+              ><button class="secondary-button" data-view="learn">
+                نكتشف حروفًا أخرى
+              </button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section id="progress-view" class="view" hidden aria-label="إنجازاتي">
+        <article class="achievement-card">
+          <div class="achievement-heading">
+            <span class="big-game-icon">★</span
+            ><span class="small-kicker">كل خطوة تستحقّ الاحتفال</span>
+            <h2>هذه مغامرتك أنت!</h2>
+            <p>إنجازاتك محفوظة على هذا الجهاز، لنكمل من حيث توقّفنا.</p>
+          </div>
+          <div class="achievement-stats">
+            <div>
+              <strong id="stat-learned">٠</strong><span>حرفًا اكتشفت</span>
+            </div>
+            <div><strong id="stat-stars">٠</strong><span>نجمة جمعت</span></div>
+            <div>
+              <strong id="stat-best">٠ / ١٠</strong><span>أفضل نتيجة</span>
+            </div>
+          </div>
+          <div class="badges" id="badges"></div>
+          <button class="primary-button" data-view="learn">
+            نكمل الرحلة<svg><use href="#i-arrow" /></svg>
+          </button>
+        </article>
+      </section>
+      <div class="sound-status" id="sound-status" role="status" hidden></div>
+      <footer>
+        <span class="footer-flower" aria-hidden="true">✿</span> قليل من اللعب،
+        كثير من التعلّم <span class="footer-heart">♡</span
+        ><span class="footer-separator">·</span><span>صُنع لفضول الصغار</span>
+      </footer>
+    </main>
+    <div class="confetti" id="confetti" aria-hidden="true"></div>
+    <script src="/data/game-audio.js"></script>
+    <script src="/games/js/audio.js"></script>
+    <script src="/games/js/letters.js"></script>
+  </body>
+</html>

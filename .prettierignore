@@ -1,0 +1,6 @@
+node_modules/
+.pgdata/
+legacy-data/
+backups/
+public/vendor/
+public/styles/tailwind.css

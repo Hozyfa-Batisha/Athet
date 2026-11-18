@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "language": "ar",
+  "script": "Uthmani",
+  "basmala": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
+  "numberingNote": "البسملة مستقلة عن ترقيم الآيات في السور الثلاث؛ تبدأ كل سورة بالآية رقم ١ بعد البسملة.",
+  "source": {
+    "provider": "AlQuran Cloud",
+    "edition": "quran-uthmani",
+    "description": "القرآن الكريم بالرسم العثماني",
+    "website": "https://alquran.cloud/",
+    "retrievedAt": "2026-11-09T23:19:36.324608+00:00",
+    "processing": "فُصلت البسملة المطابقة حرفيًا من بداية نص الآية الأولى فقط. حُفظت نصوص الآيات الأخرى كما وردت، دون تعديل أو توليد.",
+    "secondaryVerification": "تعذّر جلب نسخة Quran.com المقارنة (HTTP 403)."
+  },
+  "audioSource": {
+    "provider": "MP3Quran",
+    "website": "https://mp3quran.net/ar/afs",
+    "reciter": "مشاري العفاسي",
+    "riwayah": "حفص عن عاصم",
+    "notes": "ملفات تلاوة فعلية؛ لا يُستخدم نطق آلي لنص القرآن."
+  },
+  "surahs": [
+    {
+      "number": 112,
+      "name": "الإخلاص",
+      "title": "سُورَةُ الإِخۡلَاصِ",
+      "ayahCount": 4,
+      "sourceUrl": "https://api.alquran.cloud/v1/surah/112/quran-uthmani",
+      "audio": "audio/quran/112.mp3",
+      "audioSourceUrl": "https://cdn.mp3quran.net/audio/mishary-alafasy/r1/112.mp3",
+      "audioSha256": "269bbb62b31de70ef76ee427ff7ae38f99417475c078057378e9d0c2bc8a0aed",
+      "ayahs": [
+        {
+          "number": 1,
+          "globalNumber": 6222,
+          "text": "قُلْ هُوَ ٱللَّهُ أَحَدٌ",
+          "sourceText": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ هُوَ ٱللَّهُ أَحَدٌ"
+        },
+        {
+          "number": 2,
+          "globalNumber": 6223,
+          "text": "ٱللَّهُ ٱلصَّمَدُ",
+          "sourceText": "ٱللَّهُ ٱلصَّمَدُ"
+        },
+        {
+          "number": 3,
+          "globalNumber": 6224,
+          "text": "لَمْ يَلِدْ وَلَمْ يُولَدْ",
+          "sourceText": "لَمْ يَلِدْ وَلَمْ يُولَدْ"
+        },
+        {
+          "number": 4,
+          "globalNumber": 6225,
+          "text": "وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ",
+          "sourceText": "وَلَمْ يَكُن لَّهُۥ كُفُوًا أَحَدٌۢ"
+        }
+      ]
+    },
+    {
+      "number": 113,
+      "name": "الفلق",
+      "title": "سُورَةُ الفَلَقِ",
+      "ayahCount": 5,
+      "sourceUrl": "https://api.alquran.cloud/v1/surah/113/quran-uthmani",
+      "audio": "audio/quran/113.mp3",
+      "audioSourceUrl": "https://cdn.mp3quran.net/audio/mishary-alafasy/r1/113.mp3",
+      "audioSha256": "7c9ff4a0a57b8af5485cf11caf1c329f73589774f30b4db962215c7eb1fd1b6c",
+      "ayahs": [
+        {
+          "number": 1,
+          "globalNumber": 6226,
+          "text": "قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ",
+          "sourceText": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ أَعُوذُ بِرَبِّ ٱلْفَلَقِ"
+        },
+        {
+          "number": 2,
+          "globalNumber": 6227,
+          "text": "مِن شَرِّ مَا خَلَقَ",
+          "sourceText": "مِن شَرِّ مَا خَلَقَ"
+        },
+        {
+          "number": 3,
+          "globalNumber": 6228,
+          "text": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
+          "sourceText": "وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ"
+        },
+        {
+          "number": 4,
+          "globalNumber": 6229,
+          "text": "وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ",
+          "sourceText": "وَمِن شَرِّ ٱلنَّفَّٰثَٰتِ فِى ٱلْعُقَدِ"
+        },
+        {
+          "number": 5,
+          "globalNumber": 6230,
+          "text": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ",
+          "sourceText": "وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ"
+        }
+      ]
+    },
+    {
+      "number": 114,
+      "name": "الناس",
+      "title": "سُورَةُ النَّاسِ",
+      "ayahCount": 6,
+      "sourceUrl": "https://api.alquran.cloud/v1/surah/114/quran-uthmani",
+      "audio": "audio/quran/114.mp3",
+      "audioSourceUrl": "https://cdn.mp3quran.net/audio/mishary-alafasy/r1/114.mp3",
+      "audioSha256": "0e5c5713760072d118515036858f85292e5a11b4c5b44f5f64039a188b8a78e4",
+      "ayahs": [
+        {
+          "number": 1,
+          "globalNumber": 6231,
+          "text": "قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ",
+          "sourceText": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ قُلْ أَعُوذُ بِرَبِّ ٱلنَّاسِ"
+        },
+        {
+          "number": 2,
+          "globalNumber": 6232,
+          "text": "مَلِكِ ٱلنَّاسِ",
+          "sourceText": "مَلِكِ ٱلنَّاسِ"
+        },
+        {
+          "number": 3,
+          "globalNumber": 6233,
+          "text": "إِلَٰهِ ٱلنَّاسِ",
+          "sourceText": "إِلَٰهِ ٱلنَّاسِ"
+        },
+        {
+          "number": 4,
+          "globalNumber": 6234,
+          "text": "مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ",
+          "sourceText": "مِن شَرِّ ٱلْوَسْوَاسِ ٱلْخَنَّاسِ"
+        },
+        {
+          "number": 5,
+          "globalNumber": 6235,
+          "text": "ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ",
+          "sourceText": "ٱلَّذِى يُوَسْوِسُ فِى صُدُورِ ٱلنَّاسِ"
+        },
+        {
+          "number": 6,
+          "globalNumber": 6236,
+          "text": "مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ",
+          "sourceText": "مِنَ ٱلْجِنَّةِ وَٱلنَّاسِ"
+        }
+      ]
+    }
+  ]
+}

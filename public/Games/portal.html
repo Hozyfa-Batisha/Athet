@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f7faf8" />
+    <meta
+      name="description"
+      content="حروفي: عالم من الألعاب العربية للأطفال. تعلّم الحروف بالصوت، كوّن الكلمات، رتّب الآيات، ومرّن ذاكرتك مع مغامرات ممتعة."
+    />
+    <title>حروفي — عالم صغير، اكتشافات كبيرة</title>
+
+    <script id="app-bootstrap" type="application/json">
+      __ATHAR_BOOTSTRAP_JSON__
+    </script>
+    <script src="/js/bootstrap.js"></script>
+    <script src="/games/js/portal-theme.js"></script>
+
+    <link rel="stylesheet" href="/games/styles/portal.css" />
+  </head>
+  <body class="portal-body">
+    <svg class="svg-defs" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="p-star" viewBox="0 0 24 24">
+        <path
+          d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"
+        />
+      </symbol>
+      <symbol id="p-arrow" viewBox="0 0 24 24">
+        <path d="M20 12H4m6-6-6 6 6 6" />
+      </symbol>
+      <symbol id="p-book" viewBox="0 0 24 24">
+        <path
+          d="M12 6v15m0-15C9 3 5 3 2 4v15c4-1 7 0 10 2m0-15c3-3 7-3 10-2v15c-4-1-7 0-10 2"
+        />
+      </symbol>
+      <symbol id="p-moon" viewBox="0 0 24 24">
+        <path d="M20 15A9 9 0 0 1 9 4a9 9 0 1 0 11 11Z" />
+        <path d="m18 3 1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3Z" />
+      </symbol>
+      <symbol id="p-game" viewBox="0 0 24 24">
+        <path
+          d="M7 7h10c3 0 5 10 3 12-2 2-5-3-6-3h-4c-1 0-4 5-6 3C2 17 4 7 7 7Zm0 4v4m-2-2h4m7-2h.01m2 3h.01"
+        />
+      </symbol>
+      <symbol id="p-search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="m16 16 5 5" />
+      </symbol>
+      <symbol id="p-sound" viewBox="0 0 24 24">
+        <path
+          d="m11 5-5 4H3v6h3l5 4V5Zm4 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"
+        />
+      </symbol>
+      <symbol id="p-grid" viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" rx="2" />
+        <rect x="14" y="3" width="7" height="7" rx="2" />
+        <rect x="3" y="14" width="7" height="7" rx="2" />
+        <rect x="14" y="14" width="7" height="7" rx="2" />
+      </symbol>
+      <symbol id="p-cup" viewBox="0 0 24 24">
+        <path
+          d="M7 3h10v6a5 5 0 0 1-10 0V3Zm0 2H3v3a4 4 0 0 0 4 4m10-7h4v3a4 4 0 0 1-4 4m-5 2v5m-4 2h8"
+        />
+      </symbol>
+      <symbol id="p-spark" viewBox="0 0 24 24">
+        <path
+          d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2Z"
+        />
+      </symbol>
+    </svg>
+    <header class="portal-header">
+      <div class="portal-header-inner">
+        <a class="portal-brand" href="#home" aria-label="حروفي، الرئيسية"
+          ><span class="portal-logo">ح<span></span></span
+          ><span
+            >حروفي<span class="logo-period">.</span
+            ><small>عالَم الصغار</small></span
+          ></a
+        >
+        <nav class="portal-nav" aria-label="القائمة الرئيسية">
+          <a href="#home" data-nav="home" class="current">الرئيسية</a
+          ><a href="#category/arabic" data-nav="arabic">نتعلّم العربية</a
+          ><a href="#category/quran" data-nav="quran">القرآن الكريم</a
+          ><a href="#category/fun" data-nav="fun">نلعب ونمرح</a>
+        </nav>
+        <div class="header-actions">
+          <button
+            id="theme-toggle"
+            class="theme-toggle"
+            type="button"
+            data-theme-toggle
+            aria-label="تفعيل الوضع الداكن"
+            aria-pressed="false"
+          >
+            <span data-theme-icon aria-hidden="true">☾</span
+            ><span class="visually-hidden" data-theme-label
+              >الوضع الداكن</span
+            ></button
+          ><button
+            id="portal-sound"
+            class="sound-toggle"
+            aria-label="كتم الصوت"
+            aria-pressed="false"
+          >
+            <svg><use href="#p-sound" /></svg></button
+          ><a href="#progress" class="portal-stars"
+            ><svg><use href="#p-star" /></svg
+            ><strong id="portal-star-total">٠</strong><span>نجومي</span></a
+          >
+        </div>
+      </div>
+    </header>
+    <main class="portal-main">
+      <div id="home-page">
+        <section class="portal-hero" aria-labelledby="portal-title">
+          <div class="portal-hero-copy">
+            <div class="hero-pill">
+              <span>✦</span> مرحبًا أيّها المستكشف الصغير
+            </div>
+            <h1 id="portal-title">
+              عالم صغير،<br /><span
+                >اكتشافات كبيرة<span class="heading-doodle">✧</span></span
+              >
+            </h1>
+            <p>
+              من أوّل حرف إلى أجمل إنجاز…<br />نتعلّم العربية والقرآن، ونكبر
+              باللعب كلّ يوم.
+            </p>
+            <div class="hero-buttons">
+              <a class="teal-button" href="#games"
+                >اختر مغامرتك<svg><use href="#p-arrow" /></svg></a
+              ><a class="hero-secondary" href="letters.html#learn"
+                ><svg><use href="#p-sound" /></svg>نبدأ بأوّل حرف</a
+              >
+            </div>
+            <div class="hero-reassurance">
+              <span><i></i> ألعاب بلا إعلانات</span
+              ><span><i></i> تعلّم على مهل</span
+              ><span><i></i> بالعربية، بكل حبّ</span>
+            </div>
+          </div>
+          <div class="hero-world" aria-hidden="true">
+            <div class="world-circle"></div>
+            <span class="world-cloud cloud-one"></span
+            ><span class="world-cloud cloud-two"></span
+            ><span class="world-spark ws-one">✦</span
+            ><span class="world-spark ws-two">✧</span
+            ><span class="world-spark ws-three">✦</span>
+            <div class="floating-pill pill-letters">
+              <span>أ ب ت</span><small>كل حرف حكاية</small>
+            </div>
+            <div class="floating-pill pill-stars">
+              <span>★</span><small>يا لك من بطل!</small>
+            </div>
+            <div class="rainbow"><i></i><i></i><i></i></div>
+            <div class="book-stack">
+              <span class="stack-book stack-book-one"></span
+              ><span class="stack-book stack-book-two"></span
+              ><span class="stack-book stack-book-three"></span>
+            </div>
+            <div class="owl">
+              <span class="owl-ear ear-one"></span
+              ><span class="owl-ear ear-two"></span>
+              <div class="owl-face">
+                <span class="owl-eye eye-one"><i></i></span
+                ><span class="owl-eye eye-two"><i></i></span
+                ><span class="owl-nose"></span
+                ><span class="owl-cheek cheek-one"></span
+                ><span class="owl-cheek cheek-two"></span>
+              </div>
+              <span class="owl-wing wing-one"></span
+              ><span class="owl-wing wing-two"></span
+              ><span class="owl-feet"></span>
+            </div>
+            <div class="world-letter letter-alif">أ</div>
+            <div class="world-letter letter-ba">ب</div>
+            <div class="world-leaf leaf-one"></div>
+            <div class="world-leaf leaf-two"></div>
+            <span class="world-ground"></span>
+            <span class="world-caption">الفضول أوّل خطوات التعلّم ♡</span>
+          </div>
+        </section>
+        <section class="path-strip" aria-label="مسارات التعلّم">
+          <a href="#category/arabic"
+            ><span class="path-icon peach"
+              ><svg><use href="#p-book" /></svg></span
+            ><span
+              ><strong>نتعلّم العربية</strong
+              ><small>حروف، كلمات، وحكايات</small></span
+            ><svg class="path-arrow"><use href="#p-arrow" /></svg></a
+          ><a href="#category/quran"
+            ><span class="path-icon mint"
+              ><svg><use href="#p-moon" /></svg></span
+            ><span
+              ><strong>مع القرآن الكريم</strong
+              ><small>نقرأ، نتذكّر، ونرتّب الآيات</small></span
+            ><svg class="path-arrow"><use href="#p-arrow" /></svg></a
+          ><a href="#category/fun"
+            ><span class="path-icon lilac"
+              ><svg><use href="#p-game" /></svg></span
+            ><span
+              ><strong>وقت للمرح والذكاء</strong
+              ><small>نلعب، نفكّر، ونكتشف</small></span
+            ><svg class="path-arrow"><use href="#p-arrow" /></svg
+          ></a>
+        </section>
+        <section class="learning-path" aria-labelledby="learning-path-title">
+          <div class="learning-path-heading">
+            <div>
+              <span class="section-eyebrow">من أوّل حرف… إلى أوّل حكاية</span>
+              <h2 id="learning-path-title">
+                رحلة الحروف، خطوة بخطوة <span aria-hidden="true">✦</span>
+              </h2>
+              <p>
+                ٥ مستويات متدرجة. ابدأ من المرحلة المناسبة، وتقدّم على مهلك.
+              </p>
+            </div>
+            <a class="path-start" href="#level/1"
+              >هيا نبدأ<svg aria-hidden="true"><use href="#p-arrow" /></svg
+            ></a>
+          </div>
+          <div class="learning-levels" id="learning-levels"></div>
+        </section>
+        <section id="games" class="games-section" aria-labelledby="games-title">
+          <div class="section-top">
+            <div>
+              <span class="section-eyebrow">كل يوم مغامرة جديدة</span>
+              <h2 id="games-title">بماذا نلعب اليوم؟ <span>✦</span></h2>
+              <p>اختر ما تحبّ، ودع الاكتشاف يبدأ.</p>
+            </div>
+            <label class="game-search"
+              ><svg><use href="#p-search" /></svg
+              ><input
+                id="game-search"
+                type="search"
+                placeholder="ابحث عن لعبة…"
+                aria-label="ابحث عن لعبة"
+            /></label>
+          </div>
+          <div class="games-controls">
+            <div
+              class="category-filters"
+              role="group"
+              aria-label="تصنيف الألعاب"
+            >
+              <button data-filter="all" class="selected" aria-pressed="true">
+                <svg><use href="#p-grid" /></svg>كل الألعاب</button
+              ><button data-filter="arabic" aria-pressed="false">
+                اللغة العربية</button
+              ><button data-filter="quran" aria-pressed="false">
+                القرآن الكريم</button
+              ><button data-filter="thinking" aria-pressed="false">
+                أرقام وذكاء</button
+              ><button data-filter="fun" aria-pressed="false">
+                ألعاب ومرح
+              </button>
+            </div>
+            <span id="visible-games" class="visible-games"
+              >٢٥ مغامرة بانتظارك</span
+            >
+          </div>
+          <div
+            id="level-controls"
+            class="level-controls"
+            role="group"
+            aria-label="مستوى تعلّم العربية"
+            hidden
+          >
+            <span>مرحلتك:</span
+            ><button
+              type="button"
+              data-level-filter="all"
+              aria-pressed="true"
+              class="selected"
+            >
+              كل المستويات</button
+            ><button type="button" data-level-filter="1" aria-pressed="false">
+              ١ · الحروف</button
+            ><button type="button" data-level-filter="2" aria-pressed="false">
+              ٢ · الأشكال والنقاط</button
+            ><button type="button" data-level-filter="3" aria-pressed="false">
+              ٣ · الحركات والمدود</button
+            ><button type="button" data-level-filter="4" aria-pressed="false">
+              ٤ · الكلمات</button
+            ><button type="button" data-level-filter="5" aria-pressed="false">
+              ٥ · القراءة
+            </button>
+          </div>
+          <div class="game-library" id="game-library"></div>
+          <div id="no-games" class="empty-games" role="status" hidden>
+            <span>⌕</span>
+            <h3>لم نجد هذه اللعبة</h3>
+            <p>جرّب «حروف» أو «ذاكرة» أو اختر قسمًا آخر.</p>
+            <button id="clear-search" class="secondary-button">
+              اعرض كلّ الألعاب
+            </button>
+          </div>
+        </section>
+        <section class="little-steps">
+          <div class="steps-symbol" aria-hidden="true">🌱</div>
+          <div>
+            <span>لأهل المستكشف الصغير</span>
+            <h2>عشر دقائق من اللعب…<br />خطوة جميلة في رحلة التعلّم.</h2>
+            <p>
+              شجّع المحاولة، واحتفل بالإنجاز الصغير. هنا لا يوجد سباق؛<br />لكل
+              طفل إيقاعه، ولكل اكتشاف نجمة.
+            </p>
+          </div>
+          <a href="#progress" class="steps-link"
+            >شاهد إنجازاته<svg><use href="#p-arrow" /></svg></a
+          ><span class="steps-doodle" aria-hidden="true">✧</span>
+        </section>
+      </div>
+      <section
+        id="activity-page"
+        class="activity-page"
+        hidden
+        aria-labelledby="activity-title"
+      >
+        <div class="activity-top">
+          <a class="back-library" href="#games"
+            ><svg><use href="#p-arrow" /></svg>كلّ الألعاب</a
+          ><span id="activity-category" class="activity-category"></span>
+        </div>
+        <div class="activity-heading">
+          <span id="activity-emoji" aria-hidden="true"></span>
+          <div>
+            <h1 id="activity-title"></h1>
+            <p id="activity-description"></p>
+          </div>
+          <button id="restart-activity" class="restart-button">
+            ابدأ من جديد ↻
+          </button>
+        </div>
+        <div id="activity-stage" class="activity-stage"></div>
+      </section>
+      <section
+        id="portal-progress"
+        class="portal-progress"
+        hidden
+        aria-labelledby="progress-title"
+      >
+        <a class="back-library" href="#home"
+          ><svg><use href="#p-arrow" /></svg>العودة إلى عالم حروفي</a
+        >
+        <div class="progress-hero">
+          <span aria-hidden="true">🏆</span>
+          <div class="section-eyebrow">كل محاولة تستحقّ الاحتفال</div>
+          <h1 id="progress-title">يا لك من مستكشف رائع!</h1>
+          <p>إنجازاتك محفوظة على هذا الجهاز، لنكمل رحلتنا معًا.</p>
+        </div>
+        <div class="portal-progress-stats">
+          <article>
+            <span>✦</span><strong id="total-stars">٠</strong>
+            <p>نجمة جمعت</p>
+          </article>
+          <article>
+            <span>♧</span><strong id="total-letters">٠</strong>
+            <p>حرفًا اكتشفت</p>
+          </article>
+          <article>
+            <span>♔</span><strong id="total-completed">٠</strong>
+            <p>مغامرة أكملت</p>
+          </article>
+        </div>
+        <div class="progress-badges" id="portal-badges"></div>
+        <h2 class="recent-title">آخر اكتشافاتك</h2>
+        <div id="recent-games" class="recent-games"></div>
+        <a href="#games" class="teal-button progress-return"
+          >مغامرة جديدة<svg><use href="#p-arrow" /></svg
+        ></a>
+      </section>
+      <div id="portal-toast" class="portal-toast" role="status" hidden></div>
+      <footer class="portal-footer">
+        <a class="footer-brand" href="#home">حروفي<span>.</span></a>
+        <p>مساحة صغيرة للعب، وعالم كبير للتعلّم.</p>
+        <button id="sound-demo" class="sound-demo">
+          جرّب التشجيع <span aria-hidden="true">👏</span></button
+        ><span class="footer-made">صُنع لفضول الصغار <span>♡</span></span>
+      </footer>
+    </main>
+    <div id="portal-confetti" class="confetti" aria-hidden="true"></div>
+    <script src="/data/game-audio.js"></script>
+    <script src="/games/js/audio.js"></script>
+    <script src="/games/js/portal.js"></script>
+  </body>
+</html>

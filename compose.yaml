@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: athar
+      POSTGRES_DB: athar
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Generate .env with node scripts/setup-env.js}
+    volumes:
+      - athar_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U athar -d athar"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    init: true
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      DATABASE_URL: postgresql://athar:${POSTGRES_PASSWORD}@db:5432/athar
+      DATABASE_SSL: "false"
+      ALLOW_SIGNUP: ${ALLOW_SIGNUP:-true}
+      IMPORT_LEGACY_ON_START: ${IMPORT_LEGACY_ON_START:-true}
+      LEGACY_DATA_DIR: legacy-data
+      SESSION_HOURS: ${SESSION_HOURS:-24}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+    ports:
+      - "127.0.0.1:${PORT:-3000}:3000"
+volumes:
+  athar_pg_data:
