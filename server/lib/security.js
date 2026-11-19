@@ -99,6 +99,17 @@ export function securityHeaders(res, config) {
     res.setHeader("Strict-Transport-Security", "max-age=31536000");
 }
 
+// Client IP for rate limiting. With trustProxy, the last X-Forwarded-For entry is the address
+// our own proxy saw (earlier entries are client-supplied and can be forged).
+export function clientIp(req, config) {
+  const forwarded = config?.trustProxy && req.headers["x-forwarded-for"];
+  if (forwarded) {
+    const last = String(forwarded).split(",").pop().trim();
+    if (last) return last;
+  }
+  return req.socket.remoteAddress || "unknown";
+}
+
 export class RateLimiter {
   constructor({ limit = 20, windowMs = 60000 } = {}) {
     this.limit = limit;

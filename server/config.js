@@ -40,6 +40,9 @@ export function loadConfig(env = process.env, argv = process.argv.slice(2)) {
     driver: env.DB_DRIVER || "postgres",
     embeddedPath: env.PGLITE_PATH || "memory://",
     allowSignup: env.ALLOW_SIGNUP !== "false",
+    // Behind a reverse proxy (Traefik, nginx) every request comes from the proxy's IP;
+    // set TRUST_PROXY=true to rate-limit by the client IP the proxy appends to X-Forwarded-For.
+    trustProxy: env.TRUST_PROXY === "true",
     sessionHours: Number(env.SESSION_HOURS || 24),
     legacyDir: path.resolve(root, env.LEGACY_DATA_DIR || "legacy-data"),
     importLegacy: env.IMPORT_LEGACY_ON_START !== "false",
