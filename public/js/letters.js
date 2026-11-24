@@ -36,7 +36,7 @@ function lettersInit() {
   var lb = document.createElement("div");
   lb.id = "letter-lb";
   lb.innerHTML =
-    '<img alt=""><button class="lb-x" aria-label="إغلاق">&times;</button><button class="lb-p" aria-label="السابق">&rsaquo;</button><button class="lb-n" aria-label="التالي">&lsaquo;</button>';
+    '<img alt=""><button class="lb-x" aria-label="إغلاق">&times;</button><button class="lb-audio" type="button" aria-label="اسمع الحرف">♫</button><button class="lb-p" aria-label="السابق">&rsaquo;</button><button class="lb-n" aria-label="التالي">&lsaquo;</button>';
   document.body.appendChild(lb);
   lb.addEventListener("click", function (e) {
     if (e.target === lb || e.target.classList.contains("lb-x")) lbClose();
@@ -48,6 +48,9 @@ function lettersInit() {
   lb.querySelector(".lb-n").onclick = function (e) {
     e.stopPropagation();
     lbOpen(_lbIdx + 1);
+  };
+  lb.querySelector(".lb-audio").onclick = function () {
+    window.AlphabetAudio.play(LETTERS[_lbIdx].l);
   };
   addEventListener("keydown", function (e) {
     if (!lb.classList.contains("open")) return;
@@ -61,9 +64,11 @@ function lbOpen(i) {
   _lbIdx = (i + LETTERS.length) % LETTERS.length;
   lb.querySelector("img").src = LETTERS[_lbIdx].img;
   lb.classList.add("open");
+  window.AlphabetAudio.play(LETTERS[_lbIdx].l);
 }
 function lbClose() {
   document.getElementById("letter-lb").classList.remove("open");
+  window.AlphabetAudio.stop();
 }
 (function () {
   function hideInPlay() {

@@ -11305,3 +11305,63 @@ html[data-theme="dark"] .ar-answer.ar-answer-correct {
   border-color: var(--success-border);
   color: var(--success);
 }
+
+@font-face {
+  font-family: "KFGQPC Hafs";
+  src: url("/assets/media/23ecf11b405b7674b811.woff") format("woff");
+  font-weight: normal;
+  font-display: swap;
+}
+
+.noor-game-reading {
+  font-family: "KFGQPC Hafs", "Traditional Arabic", serif;
+  font-weight: normal;
+}
+
+.noor-game .ab-question h2,
+.noor-game-result h2 {
+  font-size: clamp(1.2rem, 4vw, 1.7rem);
+  line-height: 1.55;
+  margin: 0 0 14px;
+}
+
+.noor-game .noor-game-example {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.2rem 1.15rem;
+  border: 1px solid var(--ab-line);
+  border-radius: 14px;
+  background: var(--ab-bg);
+  color: var(--ab-ink);
+  font-size: clamp(1.85rem, 6vw, 3rem);
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.noor-game-choices {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+}
+
+.noor-game-choices .noor-game-option {
+  min-height: 4rem;
+  font-size: clamp(1.55rem, 5vw, 2.4rem);
+  overflow-wrap: anywhere;
+}
+
+.noor-game-choices.noor-game-rules {
+  max-width: 640px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+}
+
+.noor-game-rules .noor-game-option {
+  font-size: clamp(1rem, 3.2vw, 1.3rem);
+}
+
+.noor-game-next,
+.noor-game-replay {
+  min-height: 44px;
+}
+
+.card-bottom > .card-play:only-child {
+  margin-inline-start: auto;
+}

@@ -30,6 +30,8 @@ const userId = await createUser(db, {
   phone: "01000000000",
   ...credentials,
 });
+if (process.env.DEMO_EXPIRED_TRIAL === "1")
+  await db.query("UPDATE users SET created_at=now() - interval '8 days' WHERE id=$1", [userId]);
 await saveSchedule(db, userId, {
   revision: 0,
   schedule: {
@@ -60,9 +62,11 @@ const server = createApp({ db, config });
 server.prependListener("request", (req) => {
   req.headers.cookie = `sid=${token}`;
 });
-server.listen(config.port, config.host, () =>
-  console.log(`Disposable Athar demo running on port ${server.address().port}`),
-);
+server.listen(config.port, config.host, () => {
+  const port = server.address().port;
+  console.log(`Disposable Athar demo running on port ${port}`);
+  if (process.send) process.send({ type: "athar-ready", port });
+});
 for (const signal of ["SIGINT", "SIGTERM"])
   process.on(signal, () =>
     server.close(async () => {

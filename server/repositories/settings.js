@@ -1,4 +1,5 @@
 import { validateSettings } from "../lib/validation.js";
+import { publicProfile } from "./users.js";
 
 export async function readSettings(db, userId) {
   return Object.fromEntries(
@@ -47,12 +48,7 @@ export async function readNotifications(db, userId) {
 
 export async function bootstrap(db, user, session) {
   return {
-    me: {
-      user: user.username,
-      name: user.name,
-      phone: user.phone,
-      avatar: user.avatar,
-    },
+    me: publicProfile(user),
     csrfToken: session.csrf_token,
     settings: await readSettings(db, user.id),
     notifications: await readNotifications(db, user.id),

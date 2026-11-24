@@ -4,5 +4,7 @@ function GameAudio(source) {
   try {
     key = new URL(key, "https://offline.hurufi/").pathname.slice(1);
   } catch {}
-  return new Audio(GAME_AUDIO[key] || source);
+  const audio = createInPageAudio(GAME_AUDIO[key] || source);
+  if (/^audio\/\d{2}-name\.mp3$/.test(key)) audio.playbackRate = 0.8;
+  return audio;
 }

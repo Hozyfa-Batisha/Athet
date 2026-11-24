@@ -1,9 +1,15 @@
 node_modules/
+data/
+legacy-data/
+tmp/
+output/
+changes-collection/
+ather-clean/
+ather-github-merge/
 .env
 .env.*
 !.env.example
 .pgdata/
 backups/
 *.log
-coverage/
-legacy-data/
+.DS_Store

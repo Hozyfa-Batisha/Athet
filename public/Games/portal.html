@@ -247,6 +247,8 @@
                 <svg><use href="#p-grid" /></svg>كل الألعاب</button
               ><button data-filter="arabic" aria-pressed="false">
                 اللغة العربية</button
+              ><button type="button" data-filter="noor" aria-pressed="false">
+                نور البيان</button
               ><button data-filter="quran" aria-pressed="false">
                 القرآن الكريم</button
               ><button data-filter="thinking" aria-pressed="false">
@@ -255,9 +257,7 @@
                 ألعاب ومرح
               </button>
             </div>
-            <span id="visible-games" class="visible-games"
-              >٢٥ مغامرة بانتظارك</span
-            >
+            <span id="visible-games" class="visible-games"></span>
           </div>
           <div
             id="level-controls"
@@ -318,8 +318,8 @@
         aria-labelledby="activity-title"
       >
         <div class="activity-top">
-          <a class="back-library" href="#games"
-            ><svg><use href="#p-arrow" /></svg>كلّ الألعاب</a
+          <a id="activity-back" class="back-library" href="#games"
+            ><svg><use href="#p-arrow" /></svg><span>كلّ الألعاب</span></a
           ><span id="activity-category" class="activity-category"></span>
         </div>
         <div class="activity-heading">
@@ -380,8 +380,9 @@
       </footer>
     </main>
     <div id="portal-confetti" class="confetti" aria-hidden="true"></div>
-    <script src="/data/game-audio.js"></script>
-    <script src="/games/js/audio.js"></script>
-    <script src="/games/js/portal.js"></script>
+    <script src="/data/game-audio.js?v=3"></script>
+    <script src="/js/in-page-audio.js?v=2"></script>
+    <script src="/games/js/audio.js?v=2"></script>
+    <script type="module" src="/games/js/portal.js?v=2"></script>
   </body>
 </html>

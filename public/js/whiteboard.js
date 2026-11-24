@@ -993,8 +993,7 @@
   }
   // تصفيق: ملف الصوت من مجلد sounds بجانب index.html
   const APPLAUSE_FILE = "sounds/applause.mp3";
-  const applause = new Audio(APPLAUSE_FILE);
-  applause.preload = "auto";
+  const applause = createInPageAudio(APPLAUSE_FILE);
   applause.addEventListener("error", function () {
     console.error("تعذر تحميل ملف التصفيق:", APPLAUSE_FILE);
   });

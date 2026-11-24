@@ -1,7 +1,7 @@
 import { HttpError, json, readJson } from "../lib/http.js";
 import { profile, validatePassword } from "../lib/validation.js";
-import { hashPassword, verifyPassword } from "../lib/security.js";
-import { publicProfile, audit } from "../repositories/users.js";
+import { hashPassword, verifyPassword, clientAddress } from "../lib/security.js";
+import { publicProfile, defaultAvatar, audit } from "../repositories/users.js";
 
 export async function accountRoutes({
   req,
@@ -10,6 +10,7 @@ export async function accountRoutes({
   db,
   session,
   authLimiter,
+  config,
 }) {
   const userId = session.id;
   if (url.pathname === "/api/me" && req.method === "GET") {
@@ -45,13 +46,14 @@ export async function accountRoutes({
             bytes.toString("ascii", 8, 12) === "WEBP";
       if (!valid) throw new HttpError(400, "محتوى الصورة غير صالح.");
     }
+    const avatar = image || defaultAvatar(userId);
     await db.query("UPDATE users SET avatar=$2,updated_at=now() WHERE id=$1", [
       userId,
-      image,
+      avatar,
     ]);
-    json(res, { ok: true, avatar: image });
+    json(res, { ok: true, avatar });
   } else if (url.pathname === "/api/password" && req.method === "POST") {
-    authLimiter.check(`${req.socket.remoteAddress}:${userId}`);
+    authLimiter.check(`${clientAddress(req, config)}:${userId}`);
     const data = await readJson(req, 12000);
     if (
       typeof data.old !== "string" ||

@@ -1,0 +1,112 @@
+.hero,
+.story-card,
+.detail-heading,
+.detail-type,
+.slide-frame figcaption,
+.story-text,
+.ending {
+  font-family: "KFGQPC Hafs", "Amiri Quran", "Scheherazade New", serif;
+}
+
+p.story-text,
+div.ending {
+  font-size: clamp(1.5rem, 2.8vw, 1.85rem);
+  font-weight: normal;
+  line-height: 2;
+}
+
+p.story-text {
+  text-align: right;
+  white-space: normal;
+}
+
+.story-sentence {
+  display: inline;
+  border: 0;
+  padding: 0;
+  border-radius: 0.25em;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  white-space: normal;
+  line-height: inherit;
+}
+
+.story-sentence:hover,
+.story-sentence:focus-visible {
+  background: #f9eac4;
+}
+
+.story-sentence[aria-current="true"] {
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  border-radius: 0.25em;
+  box-shadow: 0 0 0 2px #ba7a20;
+  background: #ffebad;
+  color: #342513;
+  text-shadow: none;
+}
+
+.story-reading {
+  display: grid;
+  gap: 0.55rem;
+  max-width: 900px;
+  margin: 0 auto 0.75rem;
+  padding: 0.7rem;
+  border: 1px solid #f4c65e;
+  border-radius: 0.85rem;
+  background: #092a3f;
+}
+
+.story-reading-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(0.45rem, 2vw, 1rem);
+}
+
+.story-reading-controls button {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: clamp(2.8rem, 9vw, 3.4rem);
+  height: clamp(2.8rem, 9vw, 3.4rem);
+  padding: 0;
+  border: 1px solid #f4c65e;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font: 700 clamp(0.75rem, 2.5vw, 1rem) Cairo, Tahoma, sans-serif;
+  cursor: pointer;
+}
+
+.story-reading-controls svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: currentColor;
+}
+
+.story-reading-controls button:hover:not(:disabled),
+.story-reading-controls #story-listen:not(:disabled) {
+  background: #f4c65e;
+  color: #092a3f;
+}
+
+.story-reading-controls button:disabled {
+  opacity: 0.48;
+  cursor: default;
+}
+
+#story-progress {
+  width: 100%;
+  height: 0.45rem;
+  accent-color: #f4c65e;
+}
+
+#story-audio-status {
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 1px 4px #082d28;
+}

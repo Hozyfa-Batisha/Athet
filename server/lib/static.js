@@ -21,6 +21,8 @@ const MIME = {
   ".woff": "font/woff",
   ".txt": "text/plain; charset=utf-8",
 };
+const PLAYBACK_PATH =
+  /^\/media\/play(\/(?:assets\/media\/[a-f0-9]{20}|audio\/stories\/story-\d{2}|sounds\/applause))$/;
 
 export async function serveStatic({ req, res, url, db, session, config }) {
   if (!["GET", "HEAD"].includes(req.method))
@@ -31,6 +33,8 @@ export async function serveStatic({ req, res, url, db, session, config }) {
   } catch {
     throw new HttpError(400, "مسار غير صالح.");
   }
+  const playback = PLAYBACK_PATH.exec(pathname);
+  if (playback) pathname = playback[1] + ".mp3";
   if (pathname === "/") pathname = "/index.html";
   if (pathname === "/Games/hurufi.html") pathname = "/games/hurufi.html";
   if (
@@ -73,7 +77,10 @@ export async function serveStatic({ req, res, url, db, session, config }) {
   let start = 0,
     end = stat.size - 1,
     status = 200;
-  const headers = { "Content-Type": MIME[extension], "Accept-Ranges": "bytes" };
+  const headers = {
+    "Content-Type": playback ? "application/octet-stream" : MIME[extension],
+    "Accept-Ranges": "bytes",
+  };
   if (req.headers.range) {
     const match = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range);
     if (!match || (!match[1] && !match[2]))

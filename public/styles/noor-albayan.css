@@ -1,0 +1,237 @@
+#tab-noor.active {
+  color: #fff;
+  background: #0e6b55;
+  border-color: #0e6b55;
+}
+
+.noor-book {
+  --noor-border: #dfd4ee;
+  --noor-paper: #f9f6ff;
+  --noor-focus: #713ac0;
+  --noor-color-ink: 68% 28%;
+  --noor-color-bg: 79% 94%;
+  --noor-color-border: 64% 72%;
+  max-inline-size: 65rem;
+  margin-inline: auto;
+}
+
+html.dark .noor-book {
+  --noor-border: #3b5247;
+  --noor-paper: #17231e;
+  --noor-focus: #b5e8cb;
+  --noor-color-ink: 85% 88%;
+  --noor-color-bg: 33% 22%;
+  --noor-color-border: 49% 57%;
+}
+
+.noor-book :focus-visible {
+  outline: 3px solid var(--noor-focus);
+  outline-offset: 3px;
+}
+
+.noor-lessons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.noor-lesson[open] {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  border: 1px solid var(--noor-border);
+  border-radius: 1rem;
+  background: var(--noor-paper);
+}
+
+.noor-color {
+  --noor-card-hue: var(--noor-hue);
+  color: hsl(var(--noor-card-hue) var(--noor-color-ink));
+  background: hsl(var(--noor-card-hue) var(--noor-color-bg));
+  border: 1px solid hsl(var(--noor-card-hue) var(--noor-color-border));
+  border-radius: 0.85rem;
+}
+
+html.dark .noor-color {
+  --noor-card-hue: var(--noor-dark-hue);
+}
+
+.noor-lesson-label {
+  display: grid;
+  place-items: center;
+  min-block-size: 7rem;
+  padding: 0.65rem;
+  text-align: center;
+  font-size: clamp(0.95rem, 0.85rem + 0.5vw, 1.2rem);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.noor-lesson-label::-webkit-details-marker {
+  display: none;
+}
+
+.noor-lesson[open] .noor-lesson-label {
+  min-block-size: 3.5rem;
+  border: 0;
+  border-radius: 0;
+  border-block-end: 1px solid var(--noor-border);
+}
+
+.noor-lesson[open] .noor-lesson-label:focus-visible {
+  outline-offset: -4px;
+}
+
+.noor-content {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(0.65rem, 2vw, 1.5rem);
+}
+
+.noor-back {
+  justify-self: start;
+  min-block-size: 2.75rem;
+  padding: 0.4rem 0.85rem;
+  font-weight: 800;
+}
+
+.noor-practice {
+  display: grid;
+  inline-size: min(100%, 23rem);
+  justify-self: center;
+  overflow: hidden;
+  border: 1px solid var(--noor-border);
+  border-radius: 1rem;
+  background: var(--noor-paper);
+  box-shadow: 0 0.45rem 1.4rem rgb(0 0 0 / 14%);
+}
+
+.noor-practice img {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+.noor-practice:hover {
+  border-color: var(--noor-focus);
+}
+
+.noor-practice-caption {
+  padding: 0.55rem;
+  text-align: center;
+  font-weight: 800;
+}
+
+@media (min-width: 900px) {
+  main:has(.noor-book:not(.hidden) .noor-lesson-with-game[open]) {
+    max-inline-size: 93rem;
+  }
+
+  .noor-book:has(.noor-lesson-with-game[open]) {
+    max-inline-size: 90rem;
+  }
+
+  .noor-lesson-with-game[open] {
+    --noor-practice-width: clamp(13rem, 24vw, 24rem);
+    position: relative;
+    overflow: visible;
+    margin-inline-start: calc(var(--noor-practice-width) + 1rem);
+  }
+
+  .noor-lesson-with-game[open] .noor-lesson-label {
+    border-start-start-radius: calc(1rem - 1px);
+    border-start-end-radius: calc(1rem - 1px);
+  }
+
+  .noor-practice {
+    position: absolute;
+    inset-block-start: 0;
+    right: auto;
+    left: calc(100% + 1rem);
+    inline-size: var(--noor-practice-width);
+  }
+}
+
+@media (min-width: 1780px) {
+  .noor-book:has(.noor-lesson-with-game[open]) {
+    max-inline-size: 65rem;
+  }
+
+  .noor-lesson-with-game[open] {
+    --noor-practice-width: min(25rem, calc((100vw - 65rem) / 2 - 2rem));
+    margin-inline-start: 0;
+  }
+}
+
+.noor-words {
+  --noor-gap: clamp(0.4rem, 1vw, 0.7rem);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--noor-gap);
+  inline-size: 100%;
+  max-inline-size: 39rem;
+  margin-inline: auto;
+}
+
+.noor-word {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  min-inline-size: clamp(4.8rem, 10vw, 7rem);
+  max-inline-size: 100%;
+  min-block-size: clamp(4rem, 8vw, 5rem);
+  padding: 0.3rem 0.65rem;
+  font-size: clamp(1.75rem, 5.4vw, 2.6rem);
+  line-height: 1.55;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.noor-phrase {
+  font-size: clamp(1.5rem, 4.5vw, 2.25rem);
+}
+
+.noor-passage {
+  inline-size: 100%;
+  padding: 0.7rem 1rem;
+  font-size: clamp(1.25rem, 3.5vw, 1.85rem);
+  line-height: 1.95;
+}
+
+.noor-letter-name {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.noor-word-with-audio {
+  padding: 0;
+}
+
+.noor-letter-play {
+  display: grid;
+  align-content: center;
+  place-items: center;
+  width: 100%;
+  min-height: inherit;
+  padding: 0.3rem 0.65rem;
+  border-radius: inherit;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.noor-letter-play:hover {
+  background: rgb(127 127 127 / 14%);
+}
+
+@media (max-width: 540px) {
+  .noor-lessons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .noor-lesson-label {
+    min-block-size: 5.2rem;
+  }
+}

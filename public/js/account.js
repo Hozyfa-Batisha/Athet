@@ -8,12 +8,21 @@ async function loadMe() {
       return;
     }
     me = await r.json();
+    window.AppBootstrap.me = me;
     renderMe();
   } catch (e) {}
 }
 function paintAvatar(el, n) {
   el.textContent = "";
-  if (me.avatar) {
+  el.classList.remove("account-avatar-sprite");
+  el.style.removeProperty("background-position");
+  const preset = /^preset:([0-6])$/.exec(me.avatar || "");
+  if (preset) {
+    const positions = ["0% 0%", "33.333% 0%", "66.667% 0%", "100% 0%", "0% 100%", "33.333% 100%", "66.667% 100%"];
+    el.classList.add("account-avatar-sprite");
+    el.style.backgroundPosition = positions[Number(preset[1])];
+    el.setAttribute("aria-label", `صورة الحساب ${Number(preset[1]) + 1}`);
+  } else if (me.avatar) {
     const img = document.createElement("img");
     img.src = me.avatar;
     img.alt = "";
@@ -31,6 +40,7 @@ function renderMe() {
   document.getElementById("pm-name").textContent = n;
   document.getElementById("pm-phone").textContent =
     me.phone || "أضف رقمك من الإعدادات";
+  document.getElementById("vip-badge")?.classList.toggle("hidden", me.isVip !== true);
   renderNotifs();
 }
 

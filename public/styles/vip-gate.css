@@ -1,0 +1,78 @@
+.vip-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(12, 25, 27, .67);
+  font-family: Cairo, sans-serif;
+}
+.vip-gate.hidden { display: none; }
+.vip-gate-card {
+  position: relative;
+  box-sizing: border-box;
+  width: min(440px, 100%);
+  padding: 34px 28px 28px;
+  border: 2px solid #f7de91;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #fff8dd, #e8c775 55%, #b9892b);
+  color: #493207;
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .42), inset 0 2px 2px #fff8;
+}
+.vip-gate-heading {
+  color: #79500c;
+  font: 900 clamp(42px, 12vw, 64px) Cairo, sans-serif;
+  line-height: 1.1;
+  letter-spacing: 3px;
+  text-shadow: 0 2px #fff7;
+}
+.vip-gate-card h2 { margin: 8px 0 12px; font-size: 23px; font-weight: 900; }
+.vip-gate-card p { margin: 0 0 22px; font-size: 16px; font-weight: 800; line-height: 1.9; }
+.vip-gate-discount {
+  position: absolute;
+  top: -24px;
+  left: -16px;
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border: 3px solid #fff3bd;
+  border-radius: 50%;
+  background: #9a261f;
+  color: #fff;
+  font: 900 17px/1.15 Cairo, sans-serif;
+  transform: rotate(-13deg);
+  box-shadow: 0 8px 22px #0004;
+}
+.vip-gate-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  color: #493207;
+  font: 700 30px/1 Cairo, sans-serif;
+  cursor: pointer;
+}
+.vip-gate-whatsapp {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 14px;
+  padding: 13px 18px;
+  background: #25d366;
+  color: #fff;
+  text-decoration: none;
+  font: 900 18px Cairo, sans-serif;
+  box-shadow: 0 8px 18px #167d3b55;
+}
+.vip-gate-whatsapp:hover { background: #1bbd58; }
+.vip-gate-whatsapp:focus-visible, .vip-gate-close:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+@media (max-width: 480px) {
+  .vip-gate-card { padding: 32px 18px 20px; }
+  .vip-gate-card h2 { font-size: 20px; }
+  .vip-gate-card p { font-size: 14px; }
+  .vip-gate-discount { left: -8px; width: 65px; height: 65px; font-size: 14px; }
+}

@@ -1728,15 +1728,9 @@ header.no-print.hdr-hidden {
 }
 
 /* ===== خط المصحف: KFGQPC Uthmanic Hafs (مصحف المدينة) ===== */
-@font-face {
-  font-family: "KFGQPC Hafs";
-  src: url(/assets/media/23ecf11b405b7674b811.woff) format("woff");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
 .qt-list,
-.qt-bism {
+.qt-bism,
+.noor-word {
   font-family:
     "KFGQPC Hafs", "Amiri Quran", "Scheherazade New", serif !important;
   font-weight: normal;
@@ -1907,6 +1901,10 @@ html.dark #view-letters h2 {
   top: 14px;
   right: 14px;
 }
+#letter-lb .lb-audio {
+  top: 14px;
+  left: 14px;
+}
 #letter-lb .lb-p {
   right: 14px;
   top: 50%;
@@ -2018,10 +2016,10 @@ a,
     margin-top: 2px;
   }
 
-  /* --- التبويبات: شبكة 4 أعمدة بحجم لمس مريح --- */
+  /* --- التبويبات: شبكة 3 أعمدة بحجم لمس مريح --- */
   header.no-print > .max-w-7xl > .relative.flex.flex-wrap {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px !important;
     margin-bottom: 0 !important;
   }
@@ -2302,7 +2300,7 @@ a,
     justify-content: center;
   }
   header.no-print .tab-btn {
-    padding: 9px 16px;
+    padding: 9px 12px;
     font-size: 0.92rem;
     white-space: nowrap;
   }
@@ -2468,3 +2466,111 @@ html.dark .basmala.no-print,
   -moz-osx-font-smoothing: grayscale;
   text-rendering: geometricPrecision;
 }
+
+.stories-frame {
+  display: block;
+  width: 100%;
+  min-height: 82vh;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+}
+
+
+#view-stories {
+  position: relative;
+  width: auto;
+  min-height: 100vh;
+  margin-inline: calc(50% - 50vw);
+  background: transparent;
+}
+.stories-frame {
+  min-height: 100vh;
+  background: transparent !important;
+}
+
+html.stories-mode body {
+  background-color: #eaf5f7 !important;
+  background-image: url('/stories/story-background-wide.png') !important;
+  background-position: center top !important;
+  background-size: cover !important;
+  background-attachment: fixed !important;
+  background-repeat: no-repeat !important;
+}
+html.board-mode,
+html.board-mode body {
+  height: 100%;
+  overflow: hidden;
+}
+
+html.board-mode header,
+html.board-mode footer,
+html.board-mode .basmala,
+html.board-mode #hdr-handle {
+  display: none !important;
+}
+
+html.board-mode main {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+}
+
+#view-board.board-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 101;
+  background: #0b1512;
+}
+
+#board-frame {
+  display: block;
+  width: 100%;
+  height: 100dvh;
+  border: 0;
+}
+
+#board-exit {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 12px;
+  z-index: 102;
+  padding: 8px 14px;
+  border: 2px solid #c9a24b;
+  border-radius: 12px;
+  background: #0a4f40;
+  color: white;
+  font: 700 14px Cairo, Tahoma, sans-serif;
+  cursor: pointer;
+}
+
+#board-exit:hover,
+#board-exit:focus-visible {
+  background: #0e6b55;
+}
+
+.account-avatar-sprite {
+  background-image: url("/assets/account-avatar-sprite.png");
+  background-size: 400% 200%;
+  background-repeat: no-repeat;
+}
+
+#vip-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #d6a82f;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff7cc, #f3cf63);
+  color: #654600;
+  padding: 3px 9px;
+  font: 900 11px/1.4 Cairo, sans-serif;
+  letter-spacing: .06em;
+  box-shadow: 0 2px 7px #9a741f30;
+}
+
+#vip-badge.hidden { display: none; }

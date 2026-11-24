@@ -2,6 +2,7 @@ import { loadConfig } from "./config.js";
 import { openDatabase, migrate } from "./db/index.js";
 import { importLegacy } from "./services/legacy-import.js";
 import { createApp } from "./app.js";
+import { LoginThrottle } from "./services/login-throttle.js";
 
 const config = loadConfig();
 const db = await openDatabase(config);
@@ -27,7 +28,9 @@ const cleanup = setInterval(
   () =>
     db
       .query("DELETE FROM sessions WHERE expires_at < now()")
-      .catch(() => console.error("Session cleanup failed.")),
+      .then(() => db.query("DELETE FROM visitor_events WHERE visited_at < now() - interval '90 days'"))
+      .then(() => new LoginThrottle(db).cleanup())
+      .catch(() => console.error("Session and visitor cleanup failed.")),
   3600000,
 );
 cleanup.unref();

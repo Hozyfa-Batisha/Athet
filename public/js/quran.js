@@ -19,6 +19,12 @@
       g: "z",
       u: "https://everyayah.com/data/Hudhaify_128kbps/",
     },
+    {
+      n: "خليفة الطنيجي",
+      t: "الشيخ خليفة الطنيجي",
+      g: "kt",
+      u: "https://everyayah.com/data/khalefa_al_tunaiji_64kbps/",
+    },
     { n: "بندر بليلة", t: "الشيخ بندر بليلة", g: "b", qc: 160 },
     {
       n: "الحصري - معلّم",
@@ -30,19 +36,7 @@
       n: "الحصري - مجوّد",
       t: "الشيخ الحصري (المجوّد)",
       g: "hj",
-      u: "https://everyayah.com/data/Husary_Mujawwad_128kbps/",
-    },
-    {
-      n: "الحصري - سيرفر بديل",
-      t: "الشيخ الحصري (المرتّل)",
-      g: "h",
-      u: "https://verses.quran.com/Husary/mp3/",
-    },
-    {
-      n: "الحصري - على الجهاز (من غير إنترنت)",
-      t: "الشيخ الحصري (المرتّل)",
-      g: "h",
-      u: "/audio/",
+      u: "https://everyayah.com/data/Husary_128kbps_Mujawwad/",
     },
   ];
   const SID = (s) => s.u || "qc" + s.qc;

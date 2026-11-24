@@ -44,8 +44,8 @@ export function profile(name, phone) {
 
 export function validatePassword(value) {
   const password = text(value, 256, "كلمة السر");
-  if (password.length < 6)
-    throw new HttpError(400, "كلمة السر لازم تكون ٦ حروف على الأقل.");
+  if (!/^[0-9٠-٩]{6}$/u.test(password))
+    throw new HttpError(400, "كلمة السر لازم تكون ٦ أرقام بالضبط.");
   return password;
 }
 
@@ -151,6 +151,7 @@ const SETTING_KEYS = new Set([
   "hurufi-arcade-v1",
   "qsrcid",
   "quran-options",
+  "site-tour-v1-complete",
 ]);
 export function validateSettings(changes) {
   if (
@@ -181,6 +182,8 @@ export function validateSettings(changes) {
       !["true", "false"].includes(value)
     )
       throw new HttpError(400, "إعداد الصوت غير صالح.");
+    if (value !== null && key === "site-tour-v1-complete" && value !== "yes")
+      throw new HttpError(400, "حالة الجولة التعريفية غير صالحة.");
     if (
       value !== null &&
       ["hurufi-progress-v1", "hurufi-arcade-v1", "quran-options"].includes(key)

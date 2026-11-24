@@ -6,10 +6,19 @@ import path from "node:path";
 import { loadConfig } from "../server/config.js";
 import { openDatabase, migrate } from "../server/db/index.js";
 import { createApp } from "../server/app.js";
-import { hashPassword, RateLimiter } from "../server/lib/security.js";
+import { hashPassword, verifyPassword, clientAddress, RateLimiter } from "../server/lib/security.js";
+import { validatePassword } from "../server/lib/validation.js";
+import { LoginThrottle } from "../server/services/login-throttle.js";
+import { createUser } from "../server/repositories/users.js";
 import { importLegacy } from "../server/services/legacy-import.js";
 
 let db, config, server, origin, teacherA, teacherB;
+test("new passwords use exactly six digits", () => {
+  assert.equal(validatePassword("123456"), "123456");
+  assert.equal(validatePassword("١٢٣٤٥٦"), "١٢٣٤٥٦");
+  for (const invalid of ["12345", "1234567", "abcdef", "12345a"])
+    assert.throws(() => validatePassword(invalid));
+});
 async function listen() {
   server = createApp({ db, config });
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -60,10 +69,9 @@ async function request(
 }
 async function signup(username, route = "/signup") {
   const body = new URLSearchParams({
-    user: username,
-    pass: "correct-password",
-    pass2: "correct-password",
-    name: "اسم تجريبي",
+    name: username,
+    pass: "123456",
+    pass2: "123456",
     phone: "01012345678",
   });
   const response = await request(route, {
@@ -76,6 +84,8 @@ async function signup(username, route = "/signup") {
   assert.match(cookieHeader, /HttpOnly/);
   assert.match(cookieHeader, /SameSite=Strict/);
   assert.doesNotMatch(cookieHeader, /Max-Age|Expires/);
+  if (route === "/setup")
+    await db.query("UPDATE users SET role='user' WHERE username=$1", [username]);
   const account = { cookie: cookieHeader.split(";")[0] };
   account.csrf = (
     await (await request("/api/bootstrap", { account })).json()
@@ -94,20 +104,204 @@ test("authentication gates APIs and protects first-run setup", async () => {
     await request("/api/me", { account: teacherA })
   ).json();
   assert.equal(profile.user, "teacher-a");
+  assert.match(profile.avatar, /^preset:[0-6]$/);
+  assert.equal(profile.isVip, false);
   assert.ok(!("password_hash" in profile));
   const duplicate = await request("/signup", {
     method: "POST",
     body: new URLSearchParams({
-      user: "TEACHER-A",
-      pass: "correct-password",
-      pass2: "correct-password",
-      name: "اسم تجريبي",
+      name: "TEACHER-A",
+      pass: "123456",
+      pass2: "123456",
       phone: "01012345678",
     }).toString(),
   });
   assert.equal(duplicate.status, 409);
 });
 
+test("accounts can sign in with the registered name and correct password", async () => {
+  const response = await request("/login", {
+    method: "POST",
+    body: new URLSearchParams({
+      name: "teacher-a",
+      pass: "123456",
+    }).toString(),
+  });
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.get("location"), "/");
+  assert.match(response.headers.get("set-cookie"), /^sid=/);
+
+  const rejected = await request("/login", {
+    method: "POST",
+    body: new URLSearchParams({
+      name: "teacher-a",
+      pass: "wrong-password",
+    }).toString(),
+  });
+  assert.equal(rejected.status, 401);
+  assert.match(await rejected.text(), /الاسم أو كلمة السر غير صحيحة/);
+});
+
+test("failed logins trigger a timed wait that survives a fresh server instance", async () => {
+  await db.query("DELETE FROM login_attempts");
+  const isolatedConfig = { ...config };
+  const isolated = createApp({ db, config: isolatedConfig });
+  await new Promise((resolve) => isolated.listen(0, "127.0.0.1", resolve));
+  const localOrigin = `http://127.0.0.1:${isolated.address().port}`;
+  isolatedConfig.publicUrl = localOrigin;
+  const submit = (password) => fetch(`${localOrigin}/login`, {
+    method: "POST",
+    headers: { Origin: localOrigin, "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ name: "teacher-a", pass: password }),
+    redirect: "manual",
+  });
+  try {
+    for (let i = 0; i < 4; i++)
+      assert.equal((await submit("wrong-password")).status, 401);
+    const locked = await submit("wrong-password");
+    assert.equal(locked.status, 429);
+    assert.equal(locked.headers.get("retry-after"), "30");
+    const secondServer = await request("/login", {
+      method: "POST",
+      body: new URLSearchParams({ name: "teacher-a", pass: "123456" }).toString(),
+    });
+    assert.equal(secondServer.status, 429);
+  } finally {
+    isolated.closeAllConnections();
+    await new Promise((resolve) => isolated.close(resolve));
+    await db.query("DELETE FROM login_attempts");
+  }
+});
+
+test("login wait expires and a successful login resets failed attempts", async () => {
+  let now = Date.now();
+  const throttle = new LoginThrottle(db, () => now);
+  const key = throttle.key("reset-check", "127.0.0.2");
+  try {
+    for (let i = 0; i < 4; i++) await throttle.fail(key);
+    await assert.rejects(throttle.fail(key), { status: 429 });
+    now += 31_000;
+    await throttle.check(key);
+    await throttle.clear(key);
+    await throttle.fail(key);
+    assert.equal((await db.query("SELECT failures FROM login_attempts WHERE key_hash=$1", [key])).rows[0].failures, 1);
+  } finally {
+    await throttle.clear(key);
+  }
+});
+
+test("new password hashes are strengthened while old hashes remain valid", async () => {
+  const current = await hashPassword("123456");
+  assert.match(current.salt, /^s2:/);
+  assert.equal(await verifyPassword("123456", { password_salt: current.salt, password_hash: current.hash }), true);
+  const legacy = await hashPassword("123456", "legacy-salt");
+  assert.equal(await verifyPassword("123456", { password_salt: legacy.salt, password_hash: legacy.hash }), true);
+});
+
+test("forwarded client addresses are trusted only when explicitly configured", () => {
+  const req = { headers: { "x-forwarded-for": "203.0.113.4" }, socket: { remoteAddress: "127.0.0.1" } };
+  assert.equal(clientAddress(req, { trustProxy: false }), "127.0.0.1");
+  assert.equal(clientAddress(req, { trustProxy: true }), "203.0.113.4");
+  req.headers["x-forwarded-for"] = "203.0.113.4, 127.0.0.1";
+  assert.equal(clientAddress(req, { trustProxy: true }), "127.0.0.1");
+});
+
+test("legacy accounts can sign in with their displayed name", async () => {
+  const credentials = await hashPassword("legacy-correct-password");
+  await createUser(db, {
+    username: "legacy-login-user",
+    name: "الاسم القديم",
+    phone: "01012345678",
+    ...credentials,
+  });
+
+  const response = await request("/login", {
+    method: "POST",
+    body: new URLSearchParams({
+      name: "الاسم القديم",
+      pass: "legacy-correct-password",
+    }).toString(),
+  });
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.get("location"), "/");
+  assert.match(response.headers.get("set-cookie"), /^sid=/);
+});
+
+test("login and signup forms expose a single name field", async () => {
+  const login = await (await request("/login")).text();
+  const signupPage = await (await request("/signup")).text();
+  assert.match(login, /name="name"/);
+  assert.doesNotMatch(login, /name="user"/);
+  assert.match(signupPage, /name="name"/);
+  assert.doesNotMatch(signupPage, /name="user"/);
+});
+test("VIP status follows its expiry and removing a custom avatar restores the account preset", async () => {
+  await db.query("UPDATE users SET vip_until=now() + interval '1 day' WHERE username='teacher-a'");
+  const active = await (await request("/api/me", { account: teacherA })).json();
+  assert.equal(active.isVip, true);
+
+  await db.query("UPDATE users SET vip_until=now() - interval '1 second' WHERE username='teacher-a'");
+  const expired = await (await request("/api/me", { account: teacherA })).json();
+  assert.equal(expired.isVip, false);
+  await db.query("UPDATE users SET vip_until=NULL WHERE username='teacher-a'");
+
+  const before = expired.avatar;
+  const removed = await request("/api/avatar", { account: teacherA, data: { image: "" } });
+  const result = await removed.json();
+  assert.equal(removed.status, 200);
+  assert.equal(result.avatar, before);
+});
+
+test("trial ends after seven days while active VIP keeps access", async () => {
+  await db.query("UPDATE users SET created_at=now() - interval '8 days', vip_until=NULL WHERE username='teacher-b'");
+  const expired = await (await request("/api/me", { account: teacherB })).json();
+  assert.ok(new Date(expired.trialEndsAt).getTime() < Date.now());
+  assert.equal(expired.isVip, false);
+  await db.query("UPDATE users SET vip_until=now() + interval '1 day' WHERE username='teacher-b'");
+  const subscribed = await (await request("/api/me", { account: teacherB })).json();
+  assert.ok(new Date(subscribed.vipUntil).getTime() > Date.now());
+  assert.equal(subscribed.isVip, true);
+  await db.query("UPDATE users SET created_at=now(), vip_until=NULL WHERE username='teacher-b'");
+});
+test("admin accounts are routed to the admin page and blocked from app APIs", async () => {
+  await db.query("UPDATE users SET role='admin' WHERE username='teacher-b'");
+  try {
+    const home = await request("/", { account: teacherB });
+    assert.equal(home.status, 303);
+    assert.equal(home.headers.get("location"), "/admin");
+    const dashboard = await request("/admin", { account: teacherB });
+    assert.equal(dashboard.status, 200);
+    const dashboardHtml = await dashboard.text();
+    assert.match(dashboardHtml, /إدارة الحسابات/);
+    assert.match(dashboardHtml, /action="\/logout"/);
+    assert.match(dashboardHtml, /تسجيل الخروج/);
+    assert.equal((await request("/api/me", { account: teacherB })).status, 403);
+  } finally {
+    await db.query("UPDATE users SET role='user' WHERE username='teacher-b'");
+  }
+});
+test("admin can grant and revoke VIP while ordinary accounts cannot", async () => {
+  const target = (await db.query("SELECT id FROM users WHERE username='teacher-a'")).rows[0].id;
+  const until = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  const body = new URLSearchParams({ user_id: target, vip_until: until }).toString();
+  await db.query("UPDATE users SET role='admin' WHERE username='teacher-b'");
+  try {
+    const denied = await request("/admin", { account: teacherA, method: "POST", body });
+    assert.equal(denied.status, 403);
+    const granted = await request("/admin", { account: teacherB, method: "POST", body });
+    assert.equal(granted.status, 200);
+    assert.equal((await (await request("/api/me", { account: teacherA })).json()).isVip, true);
+    const revoked = await request("/admin", {
+      account: teacherB,
+      method: "POST",
+      body: new URLSearchParams({ user_id: target, vip_until: "" }).toString(),
+    });
+    assert.equal(revoked.status, 200);
+    assert.equal((await (await request("/api/me", { account: teacherA })).json()).isVip, false);
+  } finally {
+    await db.query("UPDATE users SET role='user' WHERE username='teacher-b'");
+  }
+});
 const sample = (revision = 0) => ({
   revision,
   schedule: {
@@ -271,6 +465,7 @@ test("settings, game progress and notifications are private to each account", as
             theme: "dark",
             "hurufi-progress-v1": progress,
             "hurufi-muted": "true",
+            "site-tour-v1-complete": "yes",
           },
         },
       })
@@ -283,6 +478,7 @@ test("settings, game progress and notifications are private to each account", as
   assert.equal(settings.theme, "dark");
   assert.equal(settings["hurufi-theme"], "dark");
   assert.equal(settings["hurufi-progress-v1"], progress);
+  assert.equal(settings["site-tour-v1-complete"], "yes");
   assert.deepEqual(
     await (await request("/api/settings", { account: teacherB })).json(),
     {},
@@ -338,7 +534,7 @@ test("profile updates, avatar validation and password changes preserve account i
     method: "POST",
     body: new URLSearchParams({
       user: "teacher-a",
-      pass: "correct-password",
+      pass: "123456",
     }).toString(),
   });
   const otherSession = {
@@ -348,7 +544,7 @@ test("profile updates, avatar validation and password changes preserve account i
     (
       await request("/api/password", {
         account: teacherA,
-        data: { old: "wrong", pass: "new-password" },
+        data: { old: "wrong", pass: "654321" },
       })
     ).status,
     401,
@@ -357,7 +553,7 @@ test("profile updates, avatar validation and password changes preserve account i
     (
       await request("/api/password", {
         account: teacherA,
-        data: { old: "correct-password", pass: "new-password" },
+        data: { old: "123456", pass: "654321" },
       })
     ).status,
     200,
@@ -391,7 +587,7 @@ test("static serving protects private files, supports audio ranges and has no-st
     "/Games/missing.html",
   ])
     assert.equal((await request(route, { account: teacherA })).status, 404);
-  const audio = await request("/audio/001001.mp3", {
+  const audio = await request("/audio/stories/story-01.mp3", {
     account: teacherA,
     headers: { Range: "bytes=0-99" },
   });
@@ -403,7 +599,7 @@ test("static serving protects private files, supports audio ranges and has no-st
   assert.equal(font.headers.get('content-type'), 'font/woff');
   assert.equal(
     (
-      await request("/audio/001001.mp3", {
+      await request("/audio/stories/story-01.mp3", {
         account: teacherA,
         headers: { Range: "bytes=-0" },
       })

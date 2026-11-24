@@ -26,6 +26,7 @@ services:
       HOST: 0.0.0.0
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost:3000}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
       DATABASE_URL: postgresql://athar:${POSTGRES_PASSWORD}@db:5432/athar
       DATABASE_SSL: "false"
       ALLOW_SIGNUP: ${ALLOW_SIGNUP:-true}

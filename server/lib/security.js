@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { isIP } from "node:net";
 import { promisify } from "node:util";
 import { HttpError } from "./http.js";
 
@@ -8,13 +9,16 @@ export const sha256 = (value) =>
 
 export async function hashPassword(
   password,
-  salt = crypto.randomBytes(16).toString("hex"),
+  salt = `s2:${crypto.randomBytes(16).toString("hex")}`,
 ) {
-  return { salt, hash: (await scrypt(password, salt, 64)).toString("hex") };
+  const options = salt.startsWith("s2:")
+    ? { N: 1 << 14, r: 8, p: 5, maxmem: 32 * 1024 * 1024 }
+    : {};
+  return { salt, hash: (await scrypt(password, salt, 64, options)).toString("hex") };
 }
 
 export async function verifyPassword(password, user) {
-  const salt = user?.password_salt || "invalid-account-salt";
+  const salt = user?.password_salt || "s2:00000000000000000000000000000000";
   const { hash } = await hashPassword(password, salt);
   const expected = Buffer.from(user?.password_hash || "0".repeat(128), "hex");
   const actual = Buffer.from(hash, "hex");
@@ -37,9 +41,16 @@ export function parseCookie(req, name) {
   }
 }
 
+export function clientAddress(req, config = {}) {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (config.trustProxy && typeof forwarded === "string" && isIP(forwarded.trim()))
+    return forwarded.trim();
+  return req.socket.remoteAddress || "unknown";
+}
+
 export function sessionCookie(token, config, expired = false) {
   // A session cookie has no persistent Max-Age; all actual data lives in PostgreSQL.
-  return `sid=${token}; Path=/; HttpOnly; SameSite=Strict${config.secureCookie ? "; Secure" : ""}${expired ? "; Max-Age=0" : ""}`;
+  return `${config.sessionCookieName || "sid"}=${token}; Path=/; HttpOnly; SameSite=Strict${config.secureCookie ? "; Secure" : ""}${expired ? "; Max-Age=0" : ""}`;
 }
 
 export function checkOrigin(req, config, { required = false } = {}) {
@@ -82,7 +93,7 @@ export function securityHeaders(res, config) {
   );
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob: https:; connect-src 'self' https://api.quran.com; frame-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob: https:; connect-src 'self' https://api.quran.com; frame-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'",
   );
   if (config.secureCookie)
     res.setHeader("Strict-Transport-Security", "max-age=31536000");
@@ -104,8 +115,12 @@ export class RateLimiter {
       this.entries.set(key, { count: 1, until: now + this.windowMs });
       return;
     }
-    if (record.count >= this.limit)
-      throw new HttpError(429, "محاولات كتير. استنى دقيقة وحاول مرة أخرى.");
+    if (record.count >= this.limit) {
+      const remaining = Math.max(1, Math.ceil((record.until - now) / 1000));
+      const error = new HttpError(429, `محاولات كثيرة. انتظر ${remaining} ثانية ثم حاول مجددًا.`);
+      error.retryAfter = remaining;
+      throw error;
+    }
     record.count++;
   }
 }

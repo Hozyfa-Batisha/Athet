@@ -221,7 +221,7 @@
     };
   function O({
     isMuted: e = () => !1,
-    AudioClass: r = globalThis.Audio,
+    AudioClass: r = GameAudio,
     document: n = globalThis.document,
   } = {}) {
     let s = null,

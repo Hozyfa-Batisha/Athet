@@ -19,6 +19,9 @@ export function loadConfig(env = process.env, argv = process.argv.slice(2)) {
     throw new Error("Set PUBLIC_URL before starting in production.");
   if (production && env.DB_DRIVER === "pglite")
     throw new Error("Production requires PostgreSQL via DATABASE_URL.");
+  const sessionCookieName = env.SESSION_COOKIE_NAME || "sid";
+  if (!/^[A-Za-z0-9_-]+$/.test(sessionCookieName))
+    throw new Error("Invalid SESSION_COOKIE_NAME");
   return {
     root,
     publicDir: path.join(root, "public"),
@@ -26,6 +29,8 @@ export function loadConfig(env = process.env, argv = process.argv.slice(2)) {
     host: option("host") || env.HOST || "0.0.0.0",
     production,
     publicUrl: env.PUBLIC_URL ? new URL(env.PUBLIC_URL).origin : null,
+    sessionCookieName,
+    trustProxy: env.TRUST_PROXY === "true",
     secureCookie:
       env.COOKIE_SECURE === "true" ||
       Boolean(env.PUBLIC_URL?.startsWith("https://")),

@@ -117,7 +117,12 @@
             if (pending.get(key) === value) pending.delete(key);
           if (!window.scheduleHasPendingChanges?.()) report("");
         } catch (error) {
-          report("لم تُحفظ الإعدادات على السيرفر. تحقّق من الاتصال.", true);
+          report(
+            error instanceof TypeError
+              ? "تعذر الاتصال بالسيرفر لحفظ الإعدادات. أعد المحاولة."
+              : `تعذر حفظ الإعدادات: ${error.message || "أعد المحاولة."}`,
+            true,
+          );
           throw error;
         }
       }

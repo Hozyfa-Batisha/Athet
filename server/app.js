@@ -9,14 +9,17 @@ import {
   sessionCookie,
 } from "./lib/security.js";
 import { getSession, deleteSession } from "./services/sessions.js";
+import { LoginThrottle } from "./services/login-throttle.js";
 import { hasUsers } from "./repositories/users.js";
 import { authRoutes } from "./routes/auth.js";
 import { accountRoutes } from "./routes/account.js";
 import { dataRoutes } from "./routes/data.js";
+import { adminRoutes } from "./routes/admin.js";
 import { serveStatic } from "./lib/static.js";
 
 export function createApp({ db, config }) {
   const authLimiter = new RateLimiter({ limit: 15 });
+  const loginThrottle = new LoginThrottle(db);
   const backupLimiter = new RateLimiter({ limit: 2 });
   const mutationLimiter = new RateLimiter({ limit: 240 });
   return http.createServer(
@@ -38,7 +41,7 @@ export function createApp({ db, config }) {
           checkOrigin(req, config, {
             required: ["/login", "/setup", "/signup"].includes(url.pathname),
           });
-        const session = await getSession(db, req);
+        const session = await getSession(db, req, config);
         const context = {
           req,
           res,
@@ -47,12 +50,14 @@ export function createApp({ db, config }) {
           config,
           session,
           authLimiter,
+          loginThrottle,
           backupLimiter,
         };
         if (await authRoutes(context)) return;
         const publicAsset = [
           "/styles/auth.css",
           "/logo.png",
+          "/assets/media/c34b66558d65ceb69057.png",
           "/favicon.ico",
         ].includes(url.pathname);
         if (!session && !publicAsset) {
@@ -73,6 +78,15 @@ export function createApp({ db, config }) {
           });
           return;
         }
+        if (session?.role === "admin" && url.pathname !== "/admin" && url.pathname !== "/logout") {
+          if (url.pathname.startsWith("/api/") || mutating)
+            throw new HttpError(403, "حساب المدير مخصص للوحة الإدارة فقط.");
+          redirect(res, "/admin");
+          return;
+        }
+        if (session && (await adminRoutes(context))) return;
+        if (session && req.method === "GET" && url.pathname === "/")
+          await db.query("INSERT INTO visitor_events (user_id) VALUES ($1)", [session.id]);
         if (
           session &&
           ((await accountRoutes(context)) || (await dataRoutes(context)))
@@ -87,6 +101,8 @@ export function createApp({ db, config }) {
           return;
         }
         const status = error instanceof HttpError ? error.status : 500;
+        if (status === 429 && error.retryAfter)
+          res.setHeader("Retry-After", String(error.retryAfter));
         if (status === 500)
           console.error(
             JSON.stringify({

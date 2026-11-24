@@ -1,3 +1,11 @@
+import {
+  noorGameCards,
+  noorGameRounds,
+  noorGameTopics,
+  noorLessonGames,
+} from "../../data/noor-game-data.js";
+import { mountNoorGame } from "./noor-games.js";
+
 (() => {
   var D = [
       [
@@ -2178,7 +2186,7 @@
     };
   function Te({
     isMuted: e = () => !1,
-    AudioClass: a = globalThis.Audio,
+    AudioClass: a = GameAudio,
     document: u = globalThis.document,
   } = {}) {
     let h = null,
@@ -2924,6 +2932,7 @@
       onSpeak: g = () => {},
       onPrompt: M = () => {},
       isMuted: n = () => !1,
+      focus,
     } = {},
   ) {
     let d = !1,
@@ -2949,8 +2958,9 @@
         return L(pa)
           .slice(0, 5)
           .map((c) => ({ target: c }));
+      const targetVowel = be.find((vowel) => vowel.id === focus);
       let i = L(ua).slice(0, 5),
-        s = L([...be, ...L(be).slice(0, 2)]);
+        s = targetVowel ? i.map(() => targetVowel) : L([...be, ...L(be).slice(0, 2)]);
       return i.map((c, w) => ({
         letter: D[c],
         vowel: s[w],
@@ -3543,6 +3553,7 @@
         "\u0627\u0644\u0644\u063A\u0629 \u0627\u0644\u0639\u0631\u0628\u064A\u0629",
       quran:
         "\u0627\u0644\u0642\u0631\u0622\u0646 \u0627\u0644\u0643\u0631\u064A\u0645",
+      noor: "نور البيان",
       thinking: "\u0623\u0631\u0642\u0627\u0645 \u0648\u0630\u0643\u0627\u0621",
       fun: "\u0623\u0644\u0639\u0627\u0628 \u0648\u0645\u0631\u062D",
     },
@@ -3901,6 +3912,7 @@
         badge: "\u0627\u0644\u0645\u0633\u062A\u0648\u0649 \u0665",
       },
     ];
+  ae.push(...noorGameCards);
   for (let e of ae)
     (["letters", "listen", "memory"].includes(e.id) && (e.level = 1),
       e.id === "words" && (e.level = 4));
@@ -4030,6 +4042,14 @@
         long: '<div class="curr-art-chips"><span>\u0628\u064E\u0627</span><span>\u0628\u0650\u064A</span><span>\u0628\u064F\u0648</span></div>',
         syllables:
           '<div class="curr-art-chips"><span>\u0628\u064E\u0627</span><b>+</b><span>\u0628</span></div>',
+        noorSukun:
+          '<div class="curr-art-chips noor-game-reading"><span>قْ</span><span>مْ</span><span>بْ</span></div>',
+        noorTanween:
+          '<div class="curr-art-chips noor-game-reading"><span>بًا</span><span>بٍ</span><span>بٌ</span></div>',
+        noorShadda:
+          '<div class="curr-art-chips noor-game-reading"><span>دَّ</span><span>دِّ</span><span>دُّ</span></div>',
+        noorShaddaTanween:
+          '<div class="curr-art-chips noor-game-reading"><span>قًّا</span><span>قٍّ</span><span>قٌّ</span></div>',
         picture:
           '<div class="curr-art-reading"><span>\u{1F981}</span><strong>\u0623\u064E\u0633\u064E\u062F</strong></div>',
         sentence:
@@ -4051,16 +4071,17 @@
     let e = Xe(C("game-search").value),
       a = ae.filter(
         (u) =>
-          (G === "all" || u.category === G) &&
+          (G === "all" ||
+            (G === "noor" ? noorGameTopics.has(u.id) : u.category === G)) &&
           (!K || u.level === K) &&
           Xe(
-            `${u.title} ${u.description} ${me[u.category]} ${ve.find((h) => h.id === u.level)?.title || ""}`,
+            `${u.title} ${u.description} ${me[u.category]} ${ve.find((h) => h.id === u.level)?.title || ""} ${noorGameTopics.get(u.id)?.join(" ") || ""}`,
           ).includes(e),
       );
     ((C("game-library").innerHTML = a
       .map(
         (u) =>
-          `<a class="library-card" href="${u.href || "#play/" + u.id}" style="--card-bg:${u.bg};--card-ink:${u.ink}" aria-label="\u0627\u0644\u0639\u0628 ${u.title}"><div class="card-art card-art-${u.art}" aria-hidden="true"><span class="card-badge">${u.badge}</span>${ba(u.art)}<span class="art-star">\u2726</span></div><div class="card-info"><span class="card-kicker"><i></i>${me[u.category]}</span><h3>${u.title}</h3><p>${u.description}</p><div class="card-bottom"><span class="card-age">${u.age}</span><span class="card-play">\u0647\u064A\u0627 \u0646\u0644\u0639\u0628${Pe("arrow")}</span></div></div></a>`,
+          `<a class="library-card" href="${u.href || "#play/" + u.id}" style="--card-bg:${u.bg};--card-ink:${u.ink}" aria-label="\u0627\u0644\u0639\u0628 ${u.title}"><div class="card-art card-art-${u.art}" aria-hidden="true"><span class="card-badge">${u.badge}</span>${ba(u.art)}<span class="art-star">\u2726</span></div><div class="card-info"><span class="card-kicker"><i></i>${me[u.category]}</span><h3>${u.title}</h3><p>${u.description}</p><div class="card-bottom">${u.age ? `<span class="card-age">${u.age}</span>` : ""}<span class="card-play">\u0647\u064A\u0627 \u0646\u0644\u0639\u0628${Pe("arrow")}</span></div></div></a>`,
       )
       .join("")),
       (C("no-games").hidden = a.length > 0),
@@ -4080,7 +4101,9 @@
       }),
       (C("games-title").innerHTML = K
         ? `\u0627\u0644\u0645\u0633\u062A\u0648\u0649 ${v(K)}: ${ve[K - 1].title} <span>\u2726</span>`
-        : "\u0628\u0645\u0627\u0630\u0627 \u0646\u0644\u0639\u0628 \u0627\u0644\u064A\u0648\u0645\u061F <span>\u2726</span>"));
+        : G === "noor"
+          ? "ألعاب نور البيان"
+          : "\u0628\u0645\u0627\u0630\u0627 \u0646\u0644\u0639\u0628 \u0627\u0644\u064A\u0648\u0645\u061F <span>\u2726</span>"));
   }
   function ee() {
     (re++,
@@ -4239,7 +4262,7 @@
   function we() {
     (ge?.(), (ge = null), (ie = null), ee(), Q.stop());
   }
-  function Qe(e) {
+  function Qe(e, lesson) {
     let a = ae.find((h) => h.id === e && !h.href);
     if (!a) {
       location.hash = "games";
@@ -4250,7 +4273,7 @@
       (C("home-page").hidden = !0),
       (C("portal-progress").hidden = !0),
       (C("activity-page").hidden = !1),
-      (C("activity-title").textContent = a.title),
+      (C("activity-title").textContent = lesson?.title ?? a.title),
       (C("activity-description").textContent = a.description),
       (C("activity-emoji").textContent = a.emoji),
       (C("activity-category").textContent =
@@ -4266,9 +4289,15 @@
       isMuted: () => P,
       onFeedback: (h) => Q.play(h),
       onNarrationChange: (h) => Q.setNarrating(h),
+      focus: lesson?.focus,
     };
+    const back = C("activity-back");
+    const fromNoor = lesson || G === "noor";
+    back.href = fromNoor ? "#category/noor" : "#games";
+    back.querySelector("span").textContent =
+      fromNoor ? "ألعاب نور البيان" : "كلّ الألعاب";
     try {
-      ge = (
+      const mount = noorGameRounds.has(e) ? mountNoorGame : (
         ["memory", "words", "counting"].includes(e)
           ? ke
           : ["balloons", "xo"].includes(e)
@@ -4294,13 +4323,14 @@
                     : ["sentence-builder", "reading-detective"].includes(e)
                       ? Ge
                       : Le
-      )(C("activity-stage"), e, u);
+      );
+      ge = mount(C("activity-stage"), e, u);
     } catch (h) {
       ((C("activity-stage").innerHTML =
         '<div class="load-error"><h2>\u0644\u0645 \u062A\u0643\u062A\u0645\u0644 \u062A\u0647\u064A\u0626\u0629 \u0627\u0644\u0644\u0639\u0628\u0629</h2><p>\u0627\u0636\u063A\u0637 \xAB\u0627\u0628\u062F\u0623 \u0645\u0646 \u062C\u062F\u064A\u062F\xBB \u0644\u0644\u0645\u062D\u0627\u0648\u0644\u0629 \u0645\u0631\u0651\u0629 \u0623\u062E\u0631\u0649.</p></div>'),
         console.error("Game initialization failed", h));
     }
-    ((document.title = `${a.title} \u2014 \u062D\u0631\u0648\u0641\u064A`),
+    ((document.title = `${lesson?.title ?? a.title} \u2014 \u062D\u0631\u0648\u0641\u064A`),
       (C("activity-title").tabIndex = -1),
       C("activity-title").focus({ preventScroll: !0 }),
       Y(a.category));
@@ -4317,7 +4347,10 @@
   function ce(e = !1) {
     let a = location.hash.slice(1) || "home";
     if (a.startsWith("play/")) {
-      (Qe(a.slice(5)), e || window.scrollTo({ top: 0, behavior: "instant" }));
+      const [, game, source, page] = a.split("/");
+      const lesson = source === "noor" ? noorLessonGames.get(Number(page)) : undefined;
+      Qe(game, lesson?.id === game ? lesson : undefined);
+      if (!e) window.scrollTo({ top: 0, behavior: "instant" });
       return;
     }
     we();
@@ -4412,7 +4445,7 @@
       C("game-search").focus());
   });
   C("restart-activity").addEventListener("click", () => {
-    ie && Qe(ie);
+    ie && ce(!0);
   });
   C("activity-stage").addEventListener(
     "click",

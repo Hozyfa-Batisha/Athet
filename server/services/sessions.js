@@ -15,8 +15,8 @@ export async function createSession(db, userId, hours) {
   return token;
 }
 
-export async function getSession(db, req) {
-  const token = parseCookie(req, "sid");
+export async function getSession(db, req, config = {}) {
+  const token = parseCookie(req, config.sessionCookieName || "sid");
   if (!/^[a-f0-9]{64}$/.test(token)) return null;
   const { rows } = await db.query(
     "SELECT s.token_hash,s.csrf_token,s.expires_at,u.* FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.expires_at > now()",
