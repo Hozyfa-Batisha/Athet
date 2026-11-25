@@ -2,6 +2,7 @@
 (() => {
   const element = document.getElementById("app-bootstrap");
   const initial = element ? JSON.parse(element.textContent) : {};
+  const guest = !initial.me;
   const originalFetch = window.fetch.bind(window);
   window.AppBootstrap = initial;
 
@@ -96,6 +97,7 @@
 
   async function flush() {
     clearTimeout(timer);
+    if (guest) { pending.clear(); return; }
     if (inFlight) return inFlight;
     inFlight = (async () => {
       while (pending.size) {
@@ -136,7 +138,7 @@
     if (value === null ? !(key in values) : values[key] === value) return;
     if (value === null) delete values[key];
     else values[key] = value;
-    pending.set(key, value);
+    if (!guest) pending.set(key, value);
     if (key === "theme" || key === "hurufi-theme") {
       const alias = key === "theme" ? "hurufi-theme" : "theme";
       if (value === null) delete values[alias];
@@ -145,7 +147,7 @@
     }
     broadcast(key, value);
     clearTimeout(timer);
-    timer = setTimeout(() => flush().catch(() => {}), 80);
+    if (!guest) timer = setTimeout(() => flush().catch(() => {}), 80);
   }
   window.ServerStore = Object.freeze({
     getItem: (key) => values[key] ?? null,

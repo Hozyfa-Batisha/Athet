@@ -1,7 +1,7 @@
 (() => {
   const store = window.ServerStore;
   const key = "site-tour-v1-complete";
-  if (!store || store.getItem(key) === "yes") return;
+  if (!window.AppBootstrap?.me || !store || store.getItem(key) === "yes") return;
 
   const image = (name) => `/assets/tour/${name}-cutout.png`;
   const steps = [
@@ -84,8 +84,11 @@
     }
     target = document.querySelector(step.target);
     if (!target) return finish();
+    if (matchMedia("(max-width: 640px)").matches && target.classList.contains("tab-btn"))
+      window.openMobileNav?.();
     boy.src = image(step.image);
-    root.querySelector(".tour-count").textContent = `${index + 1} من ${steps.length}`;
+    root.querySelector(".tour-count").textContent = window.AtharI18n?.language === "en"
+      ? `${index + 1} of ${steps.length}` : `${index + 1} من ${steps.length}`;
     root.querySelector("#tour-title").textContent = step.title;
     root.querySelector("#tour-text").textContent = step.text;
     back.disabled = index === 0;

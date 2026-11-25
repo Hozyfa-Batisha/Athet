@@ -3,6 +3,23 @@ body {
   background: #f7f2e6;
   color: #333;
 }
+.language-switch {
+  min-height: 38px;
+  padding: 5px 12px;
+  border: 2px solid #c9a24b;
+  border-radius: 999px;
+  background: #fffdf6;
+  color: #0a4f40;
+  font: 800 13px "Cairo", sans-serif;
+  cursor: pointer;
+  direction: ltr;
+}
+.language-switch:hover, .language-switch:focus-visible {
+  outline: 2px solid #0e6b55;
+  outline-offset: 2px;
+}
+html.dark .language-switch { background: #172b25; color: #f4e7c6; }
+html.ui-en .tab-btn { direction: ltr; }
 .schedule-table {
   border-collapse: separate;
   border-spacing: 6px;

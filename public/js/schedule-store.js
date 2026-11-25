@@ -38,12 +38,15 @@ window.onload = async function () {
   ).join("");
   initSide();
   initHarvest();
+  if (!window.AppBootstrap.me)
+    document.getElementById("guest-notice").classList.remove("hidden");
   await Promise.all([loadSchedule(), loadMe()]);
   renderScheduleTable();
   renderStudents();
 };
 
 async function loadSchedule() {
+  if (!window.AppBootstrap.me) return;
   try {
     const response = await fetch("/api/schedule");
     if (response.status === 401) {
@@ -67,6 +70,7 @@ async function loadSchedule() {
 }
 
 function canEditSchedule() {
+  if (!window.AppBootstrap.me) { location.href = "/login"; return false; }
   if (scheduleLoaded && !saveConflict) return true;
   alert(
     saveConflict

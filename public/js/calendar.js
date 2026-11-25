@@ -23,10 +23,12 @@ let calY = 0,
   lastDay = "";
 const fmtCache = {};
 function tzFmt(tz) {
-  if (!fmtCache[tz]) {
+  const english = window.AtharI18n?.language === "en";
+  const key = tz + (english ? ":en" : ":ar");
+  if (!fmtCache[key]) {
     try {
-      fmtCache[tz] = {
-        time: new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
+      fmtCache[key] = {
+        time: new Intl.DateTimeFormat(english ? "en-GB" : "ar-EG-u-nu-latn", {
           timeZone: tz,
           hour: "2-digit",
           minute: "2-digit",
@@ -40,10 +42,10 @@ function tzFmt(tz) {
         }),
       };
     } catch (e) {
-      fmtCache[tz] = null;
+      fmtCache[key] = null;
     }
   }
-  return fmtCache[tz];
+  return fmtCache[key];
 }
 
 function initSide() {
@@ -67,17 +69,18 @@ function initSide() {
 
 function tick() {
   const now = new Date();
+  const english = window.AtharI18n?.language === "en";
   document.getElementById("w-clock").textContent = new Intl.DateTimeFormat(
-    "ar-EG-u-nu-latn",
+    english ? "en-GB" : "ar-EG-u-nu-latn",
     { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true },
   ).format(now);
   document.getElementById("w-date").textContent = new Intl.DateTimeFormat(
-    "ar-EG-u-nu-latn",
+    english ? "en-GB" : "ar-EG-u-nu-latn",
     { weekday: "long", day: "numeric", month: "long", year: "numeric" },
   ).format(now);
   let hijri = "";
   try {
-    hijri = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura-nu-latn", {
+    hijri = new Intl.DateTimeFormat(english ? "en-SA-u-ca-islamic-umalqura-nu-latn" : "ar-SA-u-ca-islamic-umalqura-nu-latn", {
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -341,13 +344,14 @@ function calToday() {
 
 function renderCalendar() {
   const n = new Date();
-  const title = new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
+  const english = window.AtharI18n?.language === "en";
+  const title = new Intl.DateTimeFormat(english ? "en-GB" : "ar-EG-u-nu-latn", {
     month: "long",
     year: "numeric",
   }).format(new Date(calY, calM, 1));
   const offset = (new Date(calY, calM, 1).getDay() + 1) % 7; // الأسبوع يبدأ من السبت
   const total = new Date(calY, calM + 1, 0).getDate();
-  const heads = ["س", "ح", "ن", "ث", "ر", "خ", "ج"]
+  const heads = (english ? ["Sa", "Su", "Mo", "Tu", "We", "Th", "Fr"] : ["س", "ح", "ن", "ث", "ر", "خ", "ج"])
     .map((d) => `<div class="cal-dh">${d}</div>`)
     .join("");
   let cells = "";
@@ -366,3 +370,7 @@ function renderCalendar() {
     </div>
     <div class="cal-grid">${heads}${cells}</div>`;
 }
+window.addEventListener("athar:language", () => {
+  if (document.getElementById("w-cal")) renderCalendar();
+  if (document.getElementById("w-clock")) tick();
+});

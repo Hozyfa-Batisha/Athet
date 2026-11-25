@@ -8,7 +8,8 @@
     <script id="app-bootstrap" type="application/json">
       __ATHAR_BOOTSTRAP_JSON__
     </script>
-    <script src="/js/bootstrap.js"></script>
+    <script src="/js/bootstrap.js?v=2"></script>
+    <script src="/js/ui-language.js?v=2"></script>
     <script src="/js/theme-init.js"></script>
     <link rel="stylesheet" href="/styles/tailwind.css" />
     <script src="/vendor/tone-14.8.49.js" defer></script>
@@ -23,6 +24,7 @@
     <link rel="stylesheet" href="/styles/site-tour.css?v=2" />
     <link rel="stylesheet" href="/styles/vip-gate.css?v=1" />
     <link rel="stylesheet" href="/styles/whatsapp-notice.css?v=3" />
+    <link rel="stylesheet" href="/styles/mobile.css?v=1" />
   </head>
   <body class="min-h-screen flex flex-col justify-between">
     <div>
@@ -127,7 +129,9 @@
                     </div>
                   </div>
                 </div>
+                <a id="profile-login" href="/login" class="pm-item hidden w-full flex items-center gap-2 px-4 py-3 text-sm font-bold text-slate-800 border-b border-orangeBorder/40">تسجيل الدخول</a>
                 <button
+                  id="profile-settings"
                   type="button"
                   onclick="openSettings()"
                   class="pm-item w-full flex items-center gap-2 px-4 py-3 text-sm font-bold text-slate-800 border-b border-orangeBorder/40"
@@ -152,6 +156,7 @@
                   الإعدادات
                 </button>
                 <button
+                  id="profile-logout"
                   type="button"
                   onclick="logout()"
                   class="pm-item w-full flex items-center gap-2 px-4 py-3 text-sm font-bold text-red-600"
@@ -222,6 +227,7 @@
             <div
               class="flex items-center gap-2 flex-wrap md:justify-self-end lg:col-start-3 lg:justify-self-end"
             >
+              <button id="language-toggle" class="language-switch" type="button" onclick="AtharI18n.toggle()" aria-label="Switch to English" aria-pressed="false" title="Switch to English">English</button>
               <button
                 id="theme-toggle"
                 type="button"
@@ -248,8 +254,13 @@
           </div>
 
           <div
+            id="site-tabs"
             class="relative flex flex-wrap items-center justify-center gap-2 mb-3 md:grid md:grid-cols-[auto_auto_auto] md:justify-center"
           >
+            <button id="site-nav-toggle" type="button" aria-expanded="false" aria-controls="site-tabs" aria-label="فتح قائمة الأقسام">
+              <span class="site-nav-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+              <span class="site-nav-label">الأقسام</span>
+            </button>
             <div class="flex gap-2 md:justify-self-start">
               <button
                 id="tab-schedule"
@@ -478,6 +489,9 @@
       </button>
 
       <main class="max-w-7xl mx-auto px-2 sm:px-6 py-6">
+        <div id="guest-notice" class="hidden mb-5 rounded-2xl border border-orangeBorder bg-white p-4 text-center font-bold text-slate-800 shadow-sm">
+          أهلاً بك في أثر. <a href="/login" class="text-orangeMain underline">سجّل الدخول</a> لتعرض جدولك وتدير طلابك، أو <a href="/signup" class="text-orangeMain underline">أنشئ حسابًا جديدًا</a>.
+        </div>
         <!--  الجدول -->
         <section id="view-schedule">
           <div class="relative">
@@ -1531,11 +1545,12 @@
       <p>برجاء العلم أنه بعد ٧ أيام من إنشاء حساب جديد سينتهي الاشتراك المجاني.</p>
     </div>
     <script src="/js/header.js"></script>
+    <script src="/js/mobile-nav.js?v=1"></script>
     <script src="/data/letters-data.js"></script>
     <script src="/js/alphabet-audio.js?v=2"></script>
     <script src="/js/letters.js?v=2"></script>
     <script src="/js/letter-animation.js"></script>
-    <script type="module" src="/js/noor-albayan.js?v=3"></script>
+    <script type="module" src="/js/noor-albayan.js?v=4"></script>
     <style>
       #view-stories { background: transparent; padding: 0; }
       #stories-frame {
@@ -1597,7 +1612,7 @@
 
           // أي حاوية بيضاء عريضة نخليها شفافة
           doc.body.querySelectorAll("*").forEach(function (el) {
-            if (el === heroEl || el.tagName === "IMG") return;
+            if (el === heroEl || el.tagName === "IMG" || el.closest("#detail")) return;
             var r = el.getBoundingClientRect();
             if (r.width < win.innerWidth * 0.6) return;
             var cs = win.getComputedStyle(el);

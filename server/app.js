@@ -10,7 +10,6 @@ import {
 } from "./lib/security.js";
 import { getSession, deleteSession } from "./services/sessions.js";
 import { LoginThrottle } from "./services/login-throttle.js";
-import { hasUsers } from "./repositories/users.js";
 import { authRoutes } from "./routes/auth.js";
 import { accountRoutes } from "./routes/account.js";
 import { dataRoutes } from "./routes/data.js";
@@ -54,16 +53,11 @@ export function createApp({ db, config }) {
           backupLimiter,
         };
         if (await authRoutes(context)) return;
-        const publicAsset = [
-          "/styles/auth.css",
-          "/logo.png",
-          "/assets/media/c34b66558d65ceb69057.png",
-          "/favicon.ico",
-        ].includes(url.pathname);
-        if (!session && !publicAsset) {
-          if (url.pathname.startsWith("/api/") || url.pathname === "/logout")
+        if (!session) {
+          if (url.pathname.startsWith("/api/") || url.pathname === "/logout" || mutating)
             json(res, { ok: false, error: "auth" }, 401);
-          else redirect(res, (await hasUsers(db)) ? "/login" : "/setup");
+          else if (url.pathname === "/admin") redirect(res, "/login");
+          else await serveStatic(context);
           return;
         }
         if (session && mutating) {

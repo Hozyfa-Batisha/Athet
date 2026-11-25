@@ -1,6 +1,8 @@
 /* ===== الملف الشخصي والإعدادات ===== */
 let me = window.AppBootstrap.me || { user: "", name: "", phone: "" };
+const isGuest = !window.AppBootstrap.me;
 async function loadMe() {
+  if (isGuest) { renderMe(); return; }
   try {
     const r = await fetch("/api/me");
     if (r.status === 401) {
@@ -33,16 +35,22 @@ function paintAvatar(el, n) {
   }
 }
 function renderMe() {
-  const n = me.name || me.user || "حسابي";
+  const n = isGuest ? (window.AtharI18n?.t("زائر") || "زائر") : me.name || me.user || "حسابي";
   ["profile-avatar", "pm-avatar", "set-avatar"].forEach((id) =>
     paintAvatar(document.getElementById(id), n),
   );
   document.getElementById("pm-name").textContent = n;
   document.getElementById("pm-phone").textContent =
-    me.phone || "أضف رقمك من الإعدادات";
+    isGuest ? (window.AtharI18n?.t("سجّل الدخول لحفظ بياناتك") || "سجّل الدخول لحفظ بياناتك") : me.phone || "أضف رقمك من الإعدادات";
   document.getElementById("vip-badge")?.classList.toggle("hidden", me.isVip !== true);
+  document.getElementById("profile-login")?.classList.toggle("hidden", !isGuest);
+  document.getElementById("profile-settings")?.classList.toggle("hidden", isGuest);
+  document.getElementById("profile-logout")?.classList.toggle("hidden", isGuest);
+  document.getElementById("notif-btn")?.classList.toggle("hidden", isGuest);
+  if (isGuest) document.getElementById("profile-btn").title = "تسجيل الدخول";
   renderNotifs();
 }
+window.addEventListener("athar:language", renderMe);
 
 // ===== الإشعارات =====
 let notificationCache = window.AppBootstrap.notifications || [];
@@ -236,7 +244,7 @@ function logout() {
   Promise.all([window.ServerStore.flush(), flushSchedule()])
     .then(async () => {
       const response = await fetch("/logout", { method: "POST" });
-      if (response.ok) location.href = "/login";
+      if (response.ok) location.href = "/";
       else window.reportSaveStatus?.("تعذر تسجيل الخروج. حاول مرة أخرى.", true);
     })
     .catch(() =>

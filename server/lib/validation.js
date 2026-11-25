@@ -152,6 +152,7 @@ const SETTING_KEYS = new Set([
   "qsrcid",
   "quran-options",
   "site-tour-v1-complete",
+  "ui-language",
 ]);
 export function validateSettings(changes) {
   if (
@@ -176,6 +177,8 @@ export function validateSettings(changes) {
       !["light", "dark"].includes(value)
     )
       throw new HttpError(400, "المظهر غير صالح.");
+    if (value !== null && key === "ui-language" && !["ar", "en"].includes(value))
+      throw new HttpError(400, "اللغة غير صالحة.");
     if (
       value !== null &&
       key === "hurufi-muted" &&

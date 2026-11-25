@@ -16,7 +16,7 @@
   function upd() {
     var y = scrollY,
       d = y - last;
-    var menuOpen = document.querySelector("#profile-menu:not(.hidden)");
+    var menuOpen = document.querySelector("#profile-menu:not(.hidden), #site-tabs.mobile-open");
     if (y < 80 || menuOpen) hdr.classList.remove("hdr-hidden");
     else if (d > 6) hdr.classList.add("hdr-hidden"); // نزول → يختفي
     // الطلوع لفوق مش بيظهره — بيظهر بس لما توصل لأول الصفحة

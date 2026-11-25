@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import fsp from "node:fs/promises";
 import path from "node:path";
-import { HttpError, html, safeJson } from "./http.js";
+import { HttpError, html, redirect, safeJson } from "./http.js";
 import { bootstrap } from "../repositories/settings.js";
 
 const MIME = {
@@ -58,11 +58,15 @@ export async function serveStatic({ req, res, url, db, session, config }) {
   const extension = path.extname(real).toLowerCase();
   if (!MIME[extension]) throw new HttpError(404, "الملف غير موجود.");
   if (extension === ".html") {
+    if (!session && pathname !== "/index.html") {
+      redirect(res, "/login");
+      return;
+    }
     const template = await fsp.readFile(real, "utf8");
     const body = template.includes("__ATHAR_BOOTSTRAP_JSON__")
       ? template.replace(
           "__ATHAR_BOOTSTRAP_JSON__",
-          safeJson(await bootstrap(db, session, session)),
+          safeJson(session ? await bootstrap(db, session, session) : { me: null, csrfToken: "", settings: {}, notifications: [] }),
         )
       : template;
     if (req.method === "HEAD") {

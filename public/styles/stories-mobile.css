@@ -1,0 +1,48 @@
+/* Keep the reading surface readable over the illustrated background. */
+#detail .story-text {
+  background: #fffdf6 !important;
+  color: #263b38 !important;
+  text-shadow: none;
+}
+
+@media (max-width: 560px) {
+  main { padding: 16px 12px 30px; }
+  .hero { padding: 10px 8px 18px; }
+  .grid { gap: 12px; }
+  .story-card { aspect-ratio: 4 / 3; min-height: 150px; }
+  .card-copy { padding: 12px; }
+  .story-card h2 { font-size: 16px; }
+  .story-card p { font-size: 12px; }
+  .top-row { flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .top-row > div { flex: 1 1 100%; min-width: 0; }
+  .back { min-height: 44px; }
+  .slide {
+    grid-template-columns: repeat(2, 48px);
+    grid-template-rows: auto 48px;
+    gap: 10px;
+    justify-content: space-between;
+  }
+  .slide-frame {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+  }
+  .slide .arrow { grid-row: 2; width: 48px; height: 48px; }
+  .slide-frame figcaption { max-width: calc(100% - 16px); font-size: 12px; }
+  .story-reading { margin-top: 10px; padding: 10px; }
+  .story-reading-controls button { width: 48px; height: 48px; }
+  #detail .story-text {
+    padding: 18px;
+    border-radius: 16px;
+    font-size: clamp(1.45rem, 6.5vw, 1.75rem);
+    line-height: 2.1;
+    box-shadow: 0 10px 28px #071c1b66;
+  }
+  .ending { margin-top: 14px; padding: 14px 16px; }
+}
+
+@media (max-width: 390px) {
+  .grid { grid-template-columns: 1fr; }
+  .story-card { aspect-ratio: 16 / 10; }
+}
