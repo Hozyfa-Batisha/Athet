@@ -14,6 +14,7 @@
       __ATHAR_BOOTSTRAP_JSON__
     </script>
     <script src="/js/bootstrap.js"></script>
+    <script src="/js/ui-language.js?v=2"></script>
     <script src="/games/js/portal-theme.js"></script>
 
     <link rel="stylesheet" href="/games/styles/portal.css" />
@@ -84,6 +85,7 @@
           ><a href="#category/fun" data-nav="fun">نلعب ونمرح</a>
         </nav>
         <div class="header-actions">
+          <button id="language-toggle" type="button" onclick="AtharI18n.toggle()" aria-label="Switch to English" aria-pressed="false" style="border:1px solid #c9a24b;border-radius:999px;padding:7px 11px;background:#fff;color:#0a4f40;font:800 13px Cairo,sans-serif;cursor:pointer">English</button>
           <button
             id="theme-toggle"
             class="theme-toggle"

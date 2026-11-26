@@ -38,10 +38,16 @@ function playRender(fragment) {
 }
 
 function showTab(name, gameFragment = "") {
+  if (!window.AppBootstrap?.me && !FREE_TABS.has(name)) {
+    location.href = "/login";
+    return false;
+  }
   if (!FREE_TABS.has(name) && !window.atharHasPremiumAccess()) {
     showVipPrompt();
     return false;
   }
+
+  window.closeMobileNav?.();
 
   window.AlphabetAudio?.stop();
   document.documentElement.classList.toggle("stories-mode", name === "stories");

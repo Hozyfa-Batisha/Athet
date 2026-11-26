@@ -3,7 +3,7 @@ import { escapeHtml as esc } from "../lib/http.js";
 function page(title, inner, dark = false) {
   return `<!DOCTYPE html><html lang="ar" dir="rtl" class="${dark ? "dark" : ""}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&family=Aref+Ruqaa:wght@400;700&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles/auth.css"></head><body><div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div><div class="wrap"><div class="card">${inner}</div></div></body></html>`;
+<link rel="stylesheet" href="/styles/auth.css"><script src="/js/ui-language.js?v=2"></script></head><body><div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div><button id="language-toggle" class="language-switch" type="button" onclick="AtharI18n.toggle()" aria-label="Switch to English" aria-pressed="false">English</button><div class="wrap"><div class="card">${inner}</div></div></body></html>`;
 }
 const errorBox = (message) =>
   message ? `<div class="err" role="alert">${esc(message)}</div>` : "";

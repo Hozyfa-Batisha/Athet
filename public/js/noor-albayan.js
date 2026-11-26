@@ -50,6 +50,11 @@ function wordCards(entries, startIndex) {
   return list;
 }
 
+function letterCount(entry) {
+  const text = Array.isArray(entry) ? entry[0] : entry;
+  return (text.match(/[\u0621-\u064A\u0671-\u06D3]/g) || []).length;
+}
+
 function practiceLink(lesson, game) {
   const link = document.createElement("a");
   link.className = "noor-practice";
@@ -93,12 +98,11 @@ function lessonCard(lesson, index) {
 
   function renderWords() {
     if (!card.open) return;
-    const { first, last, opening = first } = lesson;
+    const { first, last } = lesson;
     const pages = Array.from(
       { length: last - first + 1 },
       (_, offset) => first + offset,
     );
-    const order = [opening, ...pages.filter((page) => page !== opening)];
     const content = document.createElement("div");
     content.className = "noor-content";
 
@@ -114,14 +118,12 @@ function lessonCard(lesson, index) {
     content.append(back);
     if (game) content.append(practiceLink(lesson, game));
 
-    let wordIndex = 0;
-    for (const page of order) {
-      const entries =
-        noorTextPages[page] ??
-        readingPages[page].split("|").map((entry) => entry.trim());
-      content.append(wordCards(entries, wordIndex));
-      wordIndex += entries.length;
-    }
+    const entries = pages.flatMap((page) =>
+      noorTextPages[page] ??
+      readingPages[page].split("|").map((entry) => entry.trim()).filter(Boolean),
+    );
+    entries.sort((a, b) => letterCount(a) - letterCount(b));
+    content.append(wordCards(entries, 0));
     card.append(content);
     card.removeEventListener("toggle", renderWords);
   }

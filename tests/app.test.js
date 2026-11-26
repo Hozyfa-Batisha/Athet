@@ -96,9 +96,17 @@ async function signup(username, route = "/signup") {
 
 test("authentication gates APIs and protects first-run setup", async () => {
   assert.equal((await request("/api/schedule")).status, 401);
-  assert.equal((await request("/")).headers.get("location"), "/setup");
+  const guestHome = await request("/");
+  assert.equal(guestHome.status, 200);
+  assert.match(await guestHome.text(), /"me":null/);
+  assert.equal((await request("/login")).headers.get("location"), "/setup");
   teacherA = await signup("teacher-a", "/setup");
   teacherB = await signup("teacher-b");
+  const guestPage = await request("/");
+  assert.equal(guestPage.status, 200);
+  assert.match(await guestPage.text(), /id="profile-login"/);
+  assert.equal((await request("/api/me")).status, 401);
+  assert.equal((await request("/games/hurufi.html")).headers.get("location"), "/login");
   assert.equal((await request("/setup")).headers.get("location"), "/login");
   const profile = await (
     await request("/api/me", { account: teacherA })
@@ -466,6 +474,7 @@ test("settings, game progress and notifications are private to each account", as
             "hurufi-progress-v1": progress,
             "hurufi-muted": "true",
             "site-tour-v1-complete": "yes",
+            "ui-language": "en",
           },
         },
       })
@@ -479,6 +488,7 @@ test("settings, game progress and notifications are private to each account", as
   assert.equal(settings["hurufi-theme"], "dark");
   assert.equal(settings["hurufi-progress-v1"], progress);
   assert.equal(settings["site-tour-v1-complete"], "yes");
+  assert.equal(settings["ui-language"], "en");
   assert.deepEqual(
     await (await request("/api/settings", { account: teacherB })).json(),
     {},
@@ -507,6 +517,14 @@ test("settings, game progress and notifications are private to each account", as
         data: { changes: { arbitraryServerKey: "bad" } },
       })
     ).status,
+    400,
+  );
+  assert.equal(
+    (await request("/api/settings", {
+      account: teacherA,
+      method: "PATCH",
+      data: { changes: { "ui-language": "invalid" } },
+    })).status,
     400,
   );
 });
